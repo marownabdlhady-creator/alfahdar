@@ -1,16 +1,15 @@
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6 py-section text-center">
-      <h1 className="text-step-5 font-semibold tracking-tight text-ink">
-        الفهدار
-      </h1>
-      <span
-        aria-hidden
-        className="mt-6 block h-px w-16 bg-accent"
-      />
-      <p className="mt-6 text-step-1 text-muted">
-        كل ما يحتاجه دارك في مكان واحد
-      </p>
-    </main>
+    <>
+      {/* Temporary scaffolding: verifies the transparent header over a dark
+          hero area. Replaced by the real hero in the next phase. */}
+      <section className="flex min-h-[100svh] items-center justify-center bg-bg-dark px-6 text-ink-invert">
+        <h1 className="text-step-3 tracking-tight">قريباً — الصفحة الرئيسية</h1>
+      </section>
+
+      <section className="flex min-h-screen items-center justify-center bg-bg px-6 text-ink">
+        <p className="text-step-2 text-muted">محتوى</p>
+      </section>
+    </>
   );
 }

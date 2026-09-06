@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter, Playfair_Display } from "next/font/google";
+
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
@@ -33,7 +36,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       dir="rtl"
       className={`${ibmPlexSansArabic.variable} ${playfairDisplay.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <SiteHeader />
+        {/* No top padding: the fixed header overlays the top of the page so a
+            dark hero can sit flush beneath it. Light-topped pages add their own. */}
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }
