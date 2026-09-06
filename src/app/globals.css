@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
+/* ============================================================
+   ALFAHDAR — design tokens
+   Single source of truth. Changing a value here reskins the site.
+   ============================================================ */
+
+@theme {
+  /* --- Colors --------------------------------------------------
+     --color-accent is a PLACEHOLDER gold/bronze. It will change
+     once the brand identity is final: edit it here only.        */
+  --color-bg: #f2f2f0;
+  --color-ink: #0d0d0d;
+  --color-surface: #ffffff;
+  --color-muted: #6b6b68;
+  --color-line: #e2e2de;
+  --color-accent: #a8813f;
+  --color-accent-hover: #916e33;
+  --color-ink-invert: #f2f2f0;
+  --color-bg-dark: #0d0d0d;
+
+  /* --- Fonts (values injected by next/font in layout.tsx) ----- */
+  --font-sans: var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+  --font-inter: var(--font-inter-latin), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Section rhythm (utilities: py-section, py-section-sm) -- */
+  --spacing-section: clamp(4rem, 2.5rem + 7.5vw, 9rem);
+  --spacing-section-sm: clamp(2.5rem, 1.75rem + 3.75vw, 5rem);
+
+  /* --- Motion: signature easing, deliberate and weighted ------ */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Fluid type scale + motion durations, exposed with the exact
+   token names the design system references. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --step--1: clamp(0.833rem, 0.798rem + 0.174vw, 0.9375rem);
+  --step-0: clamp(1rem, 0.958rem + 0.208vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.167rem + 0.417vw, 1.5rem);
+  --step-2: clamp(1.5625rem, 1.417rem + 0.729vw, 2rem);
+  --step-3: clamp(1.9531rem, 1.715rem + 1.189vw, 2.6667rem);
+  --step-4: clamp(2.4414rem, 2.07rem + 1.857vw, 3.5556rem);
+  --step-5: clamp(3.0518rem, 2.489rem + 2.815vw, 4.7407rem);
+
+  --dur-fast: 0.3s;
+  --dur-med: 0.6s;
+  --dur-slow: 0.9s;
 }
 
+/* Bridge the raw tokens into Tailwind utilities:
+   text-step--1 … text-step-5. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --text-step--1: var(--step--1);
+  --text-step--1--line-height: 1.6;
+  --text-step-0: var(--step-0);
+  --text-step-0--line-height: 1.75;
+  --text-step-1: var(--step-1);
+  --text-step-1--line-height: 1.5;
+  --text-step-2: var(--step-2);
+  --text-step-2--line-height: 1.35;
+  --text-step-3: var(--step-3);
+  --text-step-3--line-height: 1.25;
+  --text-step-4: var(--step-4);
+  --text-step-4--line-height: 1.15;
+  --text-step-5: var(--step-5);
+  --text-step-5--line-height: 1.05;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Duration utilities: duration-fast / duration-med / duration-slow.
+   (`duration-*` has no theme namespace in Tailwind v4.) */
+@utility duration-fast {
+  transition-duration: var(--dur-fast);
+}
+
+@utility duration-med {
+  transition-duration: var(--dur-med);
+}
+
+@utility duration-slow {
+  transition-duration: var(--dur-slow);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-ink-invert);
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur-med: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
