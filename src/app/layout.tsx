@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Arabic, Inter, Playfair_Display } from "next/font/google"
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
@@ -25,6 +26,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  // Lets pages set canonical/OG URLs as plain site-relative paths.
+  metadataBase: new URL(SITE_URL),
   title: "الفهدار",
   description: "كل ما يحتاجه دارك في مكان واحد",
 };

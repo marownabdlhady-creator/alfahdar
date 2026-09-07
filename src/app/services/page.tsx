@@ -129,10 +129,10 @@ export default function ServicesPage() {
                         >
                           {service.subServices.map((item) => (
                             <li
-                              key={item}
+                              key={item.name}
                               className="rounded-full border border-line bg-surface px-4 py-1.5 text-step--1 text-ink"
                             >
-                              {item}
+                              {item.name}
                             </li>
                           ))}
                         </ul>
