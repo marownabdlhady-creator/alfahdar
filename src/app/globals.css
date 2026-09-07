@@ -157,6 +157,24 @@ body {
 }
 
 /* ============================================================
+   Scroll reveal
+   Set --reveal-delay per element to stagger a group.
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity var(--dur-med) var(--ease-out) var(--reveal-delay, 0ms),
+    transform var(--dur-med) var(--ease-out) var(--reveal-delay, 0ms);
+}
+
+.reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ============================================================
    Reduced motion
    ============================================================ */
 
@@ -187,5 +205,10 @@ body {
   .hero-hint {
     animation: none;
     transform: scaleY(1);
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
