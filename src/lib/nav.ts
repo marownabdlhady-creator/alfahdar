@@ -5,6 +5,7 @@ export type NavLink = {
 
 export const NAV_LINKS: NavLink[] = [
   { label: "الرئيسية", href: "/" },
+  { label: "من نحن", href: "/about" },
   { label: "خدماتنا", href: "/services" },
   { label: "أعمالنا", href: "/work" },
   { label: "لماذا الفهدار", href: "/#why" },
