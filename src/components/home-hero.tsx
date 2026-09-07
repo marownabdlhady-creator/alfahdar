@@ -11,13 +11,12 @@ const SLIDES = [
   "/fahdar1.jpeg",
   "/fahdar2.jpg",
   "/fahdar3.jpg",
-  "/fahdar4.jpeg",
 ] as const;
 
 /** How long a slide is held before the next one starts fading in. */
-const HOLD_MS = 5500;
+const HOLD_MS = 4500;
 /** Cross-fade length; it overlaps the front of the incoming slide's hold. */
-const FADE_MS = 1600;
+const FADE_MS = 1300;
 
 export function HomeHero() {
   const [index, setIndex] = useState(0);
@@ -94,30 +93,40 @@ export function HomeHero() {
 
       {/* --- Content: weighted to the lower third, RTL-aligned. -------- */}
       <div className="mx-auto w-full max-w-7xl px-6 pt-32 pb-[clamp(5rem,17vh,10rem)] lg:px-10">
+        <div
+          className="hero-rise mb-6 flex items-center gap-4 sm:mb-7"
+          style={{ "--hero-delay": "0.15s" } as CSSProperties}
+        >
+          <span aria-hidden className="h-0.5 w-10 shrink-0 bg-accent sm:w-14" />
+          <span className="text-step--1 tracking-[0.14em] text-ink-invert/70">
+            مقاولات · تشطيبات · صيانة
+          </span>
+        </div>
+
         <h1
           className="hero-rise text-step-6 font-bold tracking-tight"
-          style={{ "--hero-delay": "0.15s" } as CSSProperties}
+          style={{ "--hero-delay": "0.3s" } as CSSProperties}
         >
           {BRAND.name}
         </h1>
 
         <p
           className="hero-rise mt-5 max-w-[20ch] text-step-3 font-light tracking-tight text-balance"
-          style={{ "--hero-delay": "0.35s" } as CSSProperties}
+          style={{ "--hero-delay": "0.5s" } as CSSProperties}
         >
           {BRAND.tagline}
         </p>
 
         <p
           className="hero-rise mt-6 max-w-[46ch] text-step-0 text-ink-invert/65"
-          style={{ "--hero-delay": "0.55s" } as CSSProperties}
+          style={{ "--hero-delay": "0.7s" } as CSSProperties}
         >
           مقاولات، تشطيبات، صيانة وخدمات فنية باحترافية.
         </p>
 
         <div
           className="hero-rise mt-11 flex flex-wrap items-center gap-4"
-          style={{ "--hero-delay": "0.75s" } as CSSProperties}
+          style={{ "--hero-delay": "0.9s" } as CSSProperties}
         >
           <Link
             href="/request"
