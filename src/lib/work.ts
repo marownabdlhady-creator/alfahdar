@@ -1,0 +1,120 @@
+import { SERVICES } from "./services";
+
+export type WorkItem = {
+  /** Stable id; becomes the database row id later. */
+  id: string;
+  src: string;
+  /** Intrinsic pixel size. Feeds next/image so the masonry reserves the
+      right box before the file arrives and nothing shifts. */
+  width: number;
+  height: number;
+  /** Descriptive Arabic alt text. */
+  alt: string;
+  /** Short Arabic project title, shown on the tile and in the lightbox. */
+  title: string;
+  /** One of the five service slugs. */
+  category: string;
+};
+
+/** slug → Arabic label, taken straight from the service catalogue so the
+    gallery can never drift from the rest of the site. */
+export const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
+  SERVICES.map((service) => [service.slug, service.title]),
+);
+
+/** The filter bar: "الكل" followed by the five categories, in site order. */
+export const WORK_FILTERS = [
+  { slug: "all", label: "الكل" },
+  ...SERVICES.map((service) => ({ slug: service.slug, label: service.title })),
+];
+
+/* TODO: replace static gallery data with dashboard/DB source in backend
+   phase. The photos in /public are temporary stand-ins, and the titles and
+   alt text are placeholder copy — everything a row needs is already in the
+   WorkItem shape, so swapping the source is a one-line change in the page.
+
+   Order is hand-mixed: categories and portrait/landscape ratios alternate,
+   so the unfiltered masonry reads well in every column count. */
+export const WORK_ITEMS: WorkItem[] = [
+  {
+    id: "w-01",
+    src: "/fahdar1.jpeg",
+    width: 1200,
+    height: 1600,
+    title: "بناء هيكل خرساني",
+    alt: "الفهدار — تنفيذ هيكل خرساني لمشروع سكني قيد الإنشاء.",
+    category: "construction",
+  },
+  {
+    id: "w-02",
+    src: "/fahdar3.jpg",
+    width: 1365,
+    height: 768,
+    title: "تشطيب صالة معيشة",
+    alt: "الفهدار — تشطيب داخلي لصالة معيشة بإنهاءات نهائية وإضاءة مدروسة.",
+    category: "finishing",
+  },
+  {
+    id: "w-03",
+    src: "/fahdar6.jpeg",
+    width: 1280,
+    height: 720,
+    title: "تمديدات كهربائية",
+    alt: "الفهدار — أعمال فنية تشمل تمديدات كهربائية وتركيب لوحة توزيع.",
+    category: "technical",
+  },
+  {
+    id: "w-04",
+    src: "/fahdar8.jpeg",
+    width: 720,
+    height: 1280,
+    title: "تركيب أرضيات رخام",
+    alt: "الفهدار — تركيب أرضيات رخام في مدخل فيلا سكنية.",
+    category: "finishing",
+  },
+  {
+    id: "w-05",
+    src: "/fahdar10.jpeg",
+    width: 1280,
+    height: 720,
+    title: "تشييد مبنى سكني",
+    alt: "الفهدار — أعمال مقاولات وتشييد لمبنى سكني من الخارج.",
+    category: "construction",
+  },
+  {
+    id: "w-06",
+    src: "/fahdar7.jpeg",
+    width: 1280,
+    height: 720,
+    title: "صيانة وحدة تكييف",
+    alt: "الفهدار — أعمال صيانة دورية وفحص لوحدة تكييف.",
+    category: "maintenance",
+  },
+  {
+    id: "w-07",
+    src: "/fahdar2.jpg",
+    width: 896,
+    height: 1195,
+    title: "تشطيب فيلا سكنية",
+    alt: "الفهدار — تشطيب واجهة ومدخل فيلا سكنية بمواد عالية الجودة.",
+    category: "finishing",
+  },
+  {
+    id: "w-08",
+    src: "/fahdar9.jpeg",
+    width: 1280,
+    height: 720,
+    title: "توريد مواد بناء",
+    alt: "الفهدار — توريد مواد بناء ومستلزمات التنفيذ إلى موقع المشروع.",
+    category: "supply",
+  },
+  {
+    id: "w-09",
+    src: "/fahdar5.jpeg",
+    width: 720,
+    height: 1280,
+    title: "بناء سور وواجهة",
+    alt: "الفهدار — أعمال بناء سور خارجي وواجهة لمشروع سكني.",
+    category: "construction",
+  },
+];
