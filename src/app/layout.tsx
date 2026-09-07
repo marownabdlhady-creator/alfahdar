@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter, Playfair_Display } from "next/font/google";
 
+import { PageTransition } from "@/components/page-transition";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WhatsappFab } from "@/components/whatsapp-fab";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -44,9 +46,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* No top padding: the fixed header overlays the top of the page so a
             dark hero can sit flush beneath it. Light-topped pages add their own. */}
         <main id="main" className="flex-1">
-          {children}
+          {/* Only the page content animates on navigation — the header, the
+              footer and the WhatsApp button stay put across routes. */}
+          <PageTransition>{children}</PageTransition>
         </main>
         <SiteFooter />
+        <WhatsappFab />
       </body>
     </html>
   );

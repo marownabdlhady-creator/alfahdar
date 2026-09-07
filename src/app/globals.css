@@ -190,6 +190,51 @@ textarea {
 }
 
 /* ============================================================
+   Route transitions
+   A whisper, not a show: the incoming page settles in over one short
+   beat. The fixed header and the floating action button live OUTSIDE
+   the wrapper, and the animation resolves to `transform: none`, so
+   nothing here can become the containing block of a fixed child.
+   ============================================================ */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.3s var(--ease-out) both;
+}
+
+/* ============================================================
+   Floating action button
+   Held back a beat so it arrives after the page has settled.
+   ============================================================ */
+
+@keyframes fab-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fab-in {
+  animation: fab-in 0.5s var(--ease-out) 0.6s both;
+}
+
+/* ============================================================
    Reduced motion
    ============================================================ */
 
@@ -223,6 +268,15 @@ textarea {
   }
 
   .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Both carry a delay, so zeroing the duration is not enough: without
+     this they would sit invisible through the backwards fill. */
+  .page-enter,
+  .fab-in {
+    animation: none;
     opacity: 1;
     transform: none;
   }
