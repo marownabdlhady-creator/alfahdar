@@ -1,0 +1,181 @@
+// ALFAHDAR — database schema.
+// Neon Postgres: `url` is the pooled connection the app runs on,
+// `directUrl` the unpooled one migrations need.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------
+
+/// The five service categories. Values mirror the slugs the front end uses.
+enum ServiceCategory {
+  CONSTRUCTION
+  FINISHING
+  TECHNICAL
+  MAINTENANCE
+  SUPPLY
+}
+
+/// The lifecycle of a service request:
+/// جديد، تم التواصل، تم تحديد موعد، جاري التنفيذ، مكتمل، ملغي
+enum RequestStatus {
+  NEW
+  CONTACTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ContactMessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+// ---------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------
+
+/// A service request submitted through /request.
+model ServiceRequest {
+  id String @id @default(cuid())
+
+  /// Human-facing reference, e.g. "ALF-1042". Generated in the API layer.
+  requestNumber String @unique
+
+  fullName    String
+  phone       String
+  category    ServiceCategory
+  description String
+  city        String
+  /// الحي
+  district    String
+  address     String?
+
+  preferredDate DateTime?
+  isUrgent      Boolean   @default(false)
+  notes         String?
+
+  status RequestStatus @default(NEW)
+
+  /// Uploaded photo/video URLs (Vercel Blob). Empty until uploads are wired.
+  mediaUrls String[]
+
+  /// Internal only — never shown to the client.
+  adminNotes String?
+
+  assignedTechnicianId String?
+  assignedTechnician   Technician? @relation(fields: [assignedTechnicianId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([assignedTechnicianId])
+}
+
+/// A technician a request can be assigned to. Full accounts come later.
+model Technician {
+  id String @id @default(cuid())
+
+  name        String
+  phone       String
+  /// Primary specialty.
+  specialty   ServiceCategory
+  city        String?
+  isAvailable Boolean         @default(true)
+  rating      Float?
+
+  assignedRequests ServiceRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([specialty])
+  @@index([isAvailable])
+}
+
+/// A general inquiry submitted through /contact. Kept apart from service
+/// requests so the dashboard can triage the two separately.
+model ContactMessage {
+  id String @id @default(cuid())
+
+  name    String
+  phone   String
+  email   String?
+  subject String
+  message String
+
+  status ContactMessageStatus @default(NEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+/// A client review. Hidden until an admin approves it.
+model Review {
+  id String @id @default(cuid())
+
+  clientName String
+  /// The work being reviewed, e.g. "تشطيب فيلا".
+  serviceLabel String
+  /// 1..5.
+  rating       Int
+  comment      String
+
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isApproved])
+}
+
+/// A gallery entry. Will drive /work from the dashboard.
+model WorkItem {
+  id String @id @default(cuid())
+
+  /// Arabic project title.
+  title    String
+  category ServiceCategory
+  /// Vercel Blob URL later; a /public path for now.
+  imageUrl String
+
+  /// Manual ordering within the gallery.
+  order       Int     @default(0)
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isPublished])
+  @@index([order])
+}
+
+/// A dashboard login. Passwords are hashed with bcrypt once auth is built.
+model AdminUser {
+  id String @id @default(cuid())
+
+  email        String  @unique
+  passwordHash String
+  name         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
