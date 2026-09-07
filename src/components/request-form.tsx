@@ -12,11 +12,26 @@ import {
   MAX_FILES,
   MAX_FILE_BYTES,
   MAX_FILE_MB,
-  SERVICE_SLUGS,
-  requestSchema,
-  type RequestValues,
-} from "@/lib/request-schema";
+} from "@/lib/request-options";
+import { categoryFromSlug } from "@/lib/service-category";
 import { SERVICES } from "@/lib/services";
+import {
+  serviceRequestSchema,
+  type ServiceRequestErrorResponse,
+  type ServiceRequestInput,
+  type ServiceRequestSuccessResponse,
+  type ServiceRequestValues,
+} from "@/lib/validations/service-request";
+
+/* The select shows the service catalogue's own titles but submits the
+   database enum, so the two can never drift apart. */
+const CATEGORY_OPTIONS = SERVICES.flatMap((service) => {
+  const value = categoryFromSlug(service.slug);
+  return value ? [{ value, label: service.title }] : [];
+});
+
+const NETWORK_ERROR =
+  "حدث خطأ أثناء إرسال الطلب، برجاء المحاولة مرة أخرى أو التواصل عبر واتساب.";
 
 /* --- Shared classes ---------------------------------------------- */
 
@@ -154,23 +169,19 @@ type Attachment = {
   previewUrl: string | null;
 };
 
-/** TEMPORARY. The real request number comes from the backend once the
-    submission is wired; this only makes the success state feel real. */
-function makeReference() {
-  return `ALF-${(Date.now() % 10000).toString().padStart(4, "0")}`;
-}
-
 /* --- The form ------------------------------------------------------ */
 
 export function RequestForm() {
   const searchParams = useSearchParams();
-  const requestedService = searchParams.get("service") ?? "";
-  const preselectedService = SERVICE_SLUGS.includes(requestedService)
-    ? requestedService
-    : "";
+  /* ?service=<slug> preselects the category; anything unrecognised falls
+     through to the empty placeholder option. */
+  const preselectedCategory = categoryFromSlug(
+    searchParams.get("service") ?? "",
+  );
 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [fileError, setFileError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [reference, setReference] = useState<string | null>(null);
 
   // TODO: wire real upload (Vercel Blob) in backend phase.
@@ -187,24 +198,27 @@ export function RequestForm() {
     [],
   );
 
+  /* Three generics because the schema defaults `isUrgent`: the fields hold
+     the input shape, handleSubmit hands onSubmit the parsed output. */
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm<RequestValues>({
-    resolver: zodResolver(requestSchema),
+  } = useForm<ServiceRequestInput, unknown, ServiceRequestValues>({
+    resolver: zodResolver(serviceRequestSchema),
     mode: "onBlur",
     defaultValues: {
       fullName: "",
       phone: "",
-      service: preselectedService,
+      category: preselectedCategory ?? undefined,
       description: "",
-      urgent: false,
+      isUrgent: false,
       city: "",
       district: "",
       address: "",
-      preferredAt: "",
+      preferredDate: "",
       notes: "",
     },
   });
@@ -267,16 +281,52 @@ export function RequestForm() {
     setFileError("");
   };
 
-  const onSubmit = async (values: RequestValues) => {
-    // TODO: POST `values` and `attachments` to the API in the backend phase.
-    void values;
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setReference(makeReference());
+  const onSubmit = async (values: ServiceRequestValues) => {
+    setSubmitError("");
+
+    /* Attachments are deliberately not sent yet — media upload lands in the
+       next phase, and the server stores an empty mediaUrls until then. */
+    let response: Response;
+    try {
+      response = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+    } catch {
+      setSubmitError(NETWORK_ERROR);
+      return;
+    }
+
+    if (response.ok) {
+      const data = (await response.json()) as ServiceRequestSuccessResponse;
+      setReference(data.requestNumber);
+      return;
+    }
+
+    /* Client validation catches these first; this is the safety net for
+       anything the server rejects that the browser let through. The user's
+       answers stay in the form either way. */
+    const problem = (await response
+      .json()
+      .catch(() => null)) as ServiceRequestErrorResponse | null;
+
+    if (response.status === 400 && problem?.fieldErrors) {
+      for (const [field, messages] of Object.entries(problem.fieldErrors)) {
+        const message = messages?.[0];
+        if (message) {
+          setError(field as keyof ServiceRequestInput, { message });
+        }
+      }
+    }
+
+    setSubmitError(problem?.error ?? NETWORK_ERROR);
   };
 
   const startOver = () => {
     clearAttachments();
     reset();
+    setSubmitError("");
     setReference(null);
   };
 
@@ -368,23 +418,23 @@ export function RequestForm() {
 
         <FormSection legend="تفاصيل الخدمة">
           <Field
-            id="service"
+            id="category"
             label="نوع الخدمة"
             required
-            error={errors.service?.message}
+            error={errors.category?.message}
           >
             <select
-              id="service"
+              id="category"
               aria-required="true"
-              aria-invalid={Boolean(errors.service)}
-              aria-describedby="service-error"
+              aria-invalid={Boolean(errors.category)}
+              aria-describedby="category-error"
               className={FIELD}
-              {...register("service")}
+              {...register("category")}
             >
               <option value="">اختر نوع الخدمة</option>
-              {SERVICES.map((service) => (
-                <option key={service.slug} value={service.slug}>
-                  {service.title}
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -486,7 +536,7 @@ export function RequestForm() {
             <input
               type="checkbox"
               className="mt-1 h-5 w-5 shrink-0 accent-accent"
-              {...register("urgent")}
+              {...register("isUrgent")}
             />
             <span>
               <span className="block text-step-0 font-medium">طلب عاجل</span>
@@ -558,18 +608,18 @@ export function RequestForm() {
 
         <FormSection legend="الموعد">
           <Field
-            id="preferredAt"
+            id="preferredDate"
             label="الموعد المناسب"
             hint="اختياري — الوقت الذي يناسبك للزيارة."
-            error={errors.preferredAt?.message}
+            error={errors.preferredDate?.message}
           >
             <input
-              id="preferredAt"
+              id="preferredDate"
               type="datetime-local"
               dir="ltr"
-              aria-describedby="preferredAt-hint preferredAt-error"
+              aria-describedby="preferredDate-hint preferredDate-error"
               className={`${FIELD} text-right`}
-              {...register("preferredAt")}
+              {...register("preferredDate")}
             />
           </Field>
 
@@ -590,6 +640,15 @@ export function RequestForm() {
         </FormSection>
 
         <div className="border-t border-line pt-8">
+          {submitError && (
+            <p
+              role="alert"
+              className="mb-5 rounded-lg border border-danger bg-bg p-4 text-step--1 break-words text-danger"
+            >
+              {submitError}
+            </p>
+          )}
+
           <button
             type="submit"
             disabled={isSubmitting}
