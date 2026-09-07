@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter, Playfair_Display } from "next/font/google";
 
-import { PageTransition } from "@/components/page-transition";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { WhatsappFab } from "@/components/whatsapp-fab";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -34,6 +30,9 @@ export const metadata: Metadata = {
   description: "كل ما يحتاجه دارك في مكان واحد",
 };
 
+/** Document shell only: language, direction, fonts. The public site's
+    header and footer live in the (site) group's layout, so /admin can be
+    its own bare shell under the same document. */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -41,18 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       dir="rtl"
       className={`${ibmPlexSansArabic.variable} ${playfairDisplay.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        {/* No top padding: the fixed header overlays the top of the page so a
-            dark hero can sit flush beneath it. Light-topped pages add their own. */}
-        <main id="main" className="flex-1">
-          {/* Only the page content animates on navigation — the header, the
-              footer and the WhatsApp button stay put across routes. */}
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <SiteFooter />
-        <WhatsappFab />
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
