@@ -18,6 +18,9 @@
   --color-accent-hover: #916e33;
   --color-ink-invert: #f2f2f0;
   --color-bg-dark: #0d0d0d;
+  /* Form validation only. Warm enough to sit with the palette, dark
+     enough to clear AA on --color-bg and --color-surface. */
+  --color-danger: #a32b1c;
 
   /* --- Fonts (values injected by next/font in layout.tsx) ----- */
   --font-sans: var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
