@@ -232,37 +232,35 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
 
   return (
     <>
-      {/* The chip row scrolls inside itself and bleeds to the gutter edge,
-          so a long list never widens the page. */}
-      <div className="-mx-4 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10 [&::-webkit-scrollbar]:hidden">
-        <ul
-          aria-label="تصفية الأعمال حسب القسم"
-          className="flex w-max gap-2 sm:gap-2.5"
-        >
-          {WORK_FILTERS.map((filter) => {
-            const selected = filter.slug === active;
-            return (
-              <li key={filter.slug}>
-                <button
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => pickFilter(filter.slug)}
-                  className={[
-                    "rounded-full border px-4 py-2.5 text-step--1 font-medium whitespace-nowrap",
-                    "transition-colors duration-fast ease-out",
-                    "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
-                    selected
-                      ? "border-accent bg-accent text-ink"
-                      : "border-line bg-surface text-ink hover:border-ink",
-                  ].join(" ")}
-                >
-                  {filter.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {/* Every category is on screen at once: the chips wrap onto as many
+          rows as they need rather than hiding any past the edge. */}
+      <ul
+        aria-label="تصفية الأعمال حسب القسم"
+        className="flex flex-wrap gap-2 sm:gap-2.5"
+      >
+        {WORK_FILTERS.map((filter) => {
+          const selected = filter.slug === active;
+          return (
+            <li key={filter.slug}>
+              <button
+                type="button"
+                aria-pressed={selected}
+                onClick={() => pickFilter(filter.slug)}
+                className={[
+                  "rounded-full border px-4 py-2.5 text-step--1 font-medium",
+                  "transition-colors duration-fast ease-out",
+                  "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent",
+                  selected
+                    ? "border-accent bg-accent text-ink"
+                    : "border-line bg-surface text-ink hover:border-ink",
+                ].join(" ")}
+              >
+                {filter.label}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
       {shown.length === 0 ? (
         <p className="mt-10 text-step-0 text-muted">
