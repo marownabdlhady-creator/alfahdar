@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 
-import { contactSchema, type ContactValues } from "@/lib/contact-schema";
+import {
+  contactMessageSchema,
+  type ContactMessageErrorResponse,
+  type ContactMessageValues,
+} from "@/lib/validations/contact-message";
+
+const NETWORK_ERROR =
+  "حدث خطأ أثناء إرسال رسالتك، برجاء المحاولة مرة أخرى أو التواصل عبر واتساب.";
 
 /* --- Shared classes ---------------------------------------------- */
 
@@ -88,14 +95,16 @@ function Field({
 
 export function ContactForm() {
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm<ContactValues>({
-    resolver: zodResolver(contactSchema),
+  } = useForm<ContactMessageValues>({
+    resolver: zodResolver(contactMessageSchema),
     mode: "onBlur",
     defaultValues: {
       name: "",
@@ -106,16 +115,48 @@ export function ContactForm() {
     },
   });
 
-  const onSubmit = async (values: ContactValues) => {
-    // TODO: wire to backend (contact messages) in backend phase — dashboard
-    // will show these separately from service requests.
-    void values;
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setSent(true);
+  const onSubmit = async (values: ContactMessageValues) => {
+    setSubmitError("");
+
+    let response: Response;
+    try {
+      response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+    } catch {
+      setSubmitError(NETWORK_ERROR);
+      return;
+    }
+
+    if (response.ok) {
+      setSent(true);
+      return;
+    }
+
+    /* Client validation catches these first; this is the safety net for
+       anything the server rejects that the browser let through. What the
+       user typed stays in the form either way. */
+    const problem = (await response
+      .json()
+      .catch(() => null)) as ContactMessageErrorResponse | null;
+
+    if (response.status === 400 && problem?.fieldErrors) {
+      for (const [field, messages] of Object.entries(problem.fieldErrors)) {
+        const message = messages?.[0];
+        if (message) {
+          setError(field as keyof ContactMessageValues, { message });
+        }
+      }
+    }
+
+    setSubmitError(problem?.error ?? NETWORK_ERROR);
   };
 
   const startOver = () => {
     reset();
+    setSubmitError("");
     setSent(false);
   };
 
@@ -245,6 +286,15 @@ export function ContactForm() {
       </div>
 
       <div className="mt-8 border-t border-line pt-8">
+        {submitError && (
+          <p
+            role="alert"
+            className="mb-5 rounded-lg border border-danger bg-bg p-4 text-step--1 break-words text-danger"
+          >
+            {submitError}
+          </p>
+        )}
+
         <button
           type="submit"
           disabled={isSubmitting}
