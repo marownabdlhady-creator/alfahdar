@@ -80,41 +80,6 @@ function PlusIcon() {
   );
 }
 
-const TRUST_POINTS = [
-  {
-    title: "رد سريع من فريقنا",
-    description: "نتواصل معك لتأكيد التفاصيل وتحديد الموعد.",
-    icon: (
-      <Stroke>
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M12 7.2V12l3.2 1.9" />
-      </Stroke>
-    ),
-  },
-  {
-    title: "فنيون مختصون",
-    description: "فريق مدرَّب لكل تخصص، بلا وسطاء.",
-    icon: (
-      <Stroke>
-        <circle cx="9.5" cy="8" r="3.5" />
-        <path d="M3.5 19v-1.2A4.3 4.3 0 0 1 7.8 13.5h3.4a4.3 4.3 0 0 1 4.3 4.3V19" />
-        <path d="M16.2 5.4a3.3 3.3 0 0 1 0 6.2" />
-        <path d="M17.6 14a4 4 0 0 1 2.9 3.8V19" />
-      </Stroke>
-    ),
-  },
-  {
-    title: "أسعار واضحة",
-    description: "عرض سعر مفصّل قبل بدء العمل.",
-    icon: (
-      <Stroke>
-        <path d="M20.4 12.9 12.9 20.4a1.7 1.7 0 0 1-2.4 0l-6.5-6.5a1.7 1.7 0 0 1-.5-1.2V5a1.6 1.6 0 0 1 1.6-1.6h7.7c.5 0 .9.2 1.2.5l6.4 6.4a1.7 1.7 0 0 1 0 2.6Z" />
-        <path d="M8 8h.01" />
-      </Stroke>
-    ),
-  },
-] as const;
-
 /* --- Small building blocks ---------------------------------------- */
 
 function FormSection({
@@ -353,337 +318,294 @@ export function RequestForm() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-3 lg:gap-10">
-      <Reveal className="lg:col-span-2">
-        <form
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-9 rounded-2xl border border-line bg-surface p-7 sm:p-10"
-        >
-          <FormSection legend="بياناتك">
-            <Field
+    <Reveal>
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-9 rounded-2xl border border-line bg-surface p-7 sm:p-10"
+      >
+        <FormSection legend="بياناتك">
+          <Field
+            id="fullName"
+            label="الاسم الكامل"
+            required
+            error={errors.fullName?.message}
+          >
+            <input
               id="fullName"
-              label="الاسم الكامل"
-              required
-              error={errors.fullName?.message}
-            >
-              <input
-                id="fullName"
-                type="text"
-                autoComplete="name"
-                placeholder="مثال: عبدالله الشمري"
-                aria-required="true"
-                aria-invalid={Boolean(errors.fullName)}
-                aria-describedby="fullName-error"
-                className={FIELD}
-                {...register("fullName")}
-              />
-            </Field>
+              type="text"
+              autoComplete="name"
+              placeholder="مثال: عبدالله الشمري"
+              aria-required="true"
+              aria-invalid={Boolean(errors.fullName)}
+              aria-describedby="fullName-error"
+              className={FIELD}
+              {...register("fullName")}
+            />
+          </Field>
 
-            <Field
+          <Field
+            id="phone"
+            label="رقم الجوال"
+            required
+            error={errors.phone?.message}
+          >
+            <input
               id="phone"
-              label="رقم الجوال"
-              required
-              error={errors.phone?.message}
-            >
-              <input
-                id="phone"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                dir="ltr"
-                placeholder="05XXXXXXXX"
-                aria-required="true"
-                aria-invalid={Boolean(errors.phone)}
-                aria-describedby="phone-error"
-                className={`${FIELD} text-right`}
-                {...register("phone")}
-              />
-            </Field>
-          </FormSection>
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              dir="ltr"
+              placeholder="05XXXXXXXX"
+              aria-required="true"
+              aria-invalid={Boolean(errors.phone)}
+              aria-describedby="phone-error"
+              className={`${FIELD} text-right`}
+              {...register("phone")}
+            />
+          </Field>
+        </FormSection>
 
-          <FormSection legend="تفاصيل الخدمة">
-            <Field
+        <FormSection legend="تفاصيل الخدمة">
+          <Field
+            id="service"
+            label="نوع الخدمة"
+            required
+            error={errors.service?.message}
+          >
+            <select
               id="service"
-              label="نوع الخدمة"
-              required
-              error={errors.service?.message}
+              aria-required="true"
+              aria-invalid={Boolean(errors.service)}
+              aria-describedby="service-error"
+              className={FIELD}
+              {...register("service")}
             >
-              <select
-                id="service"
-                aria-required="true"
-                aria-invalid={Boolean(errors.service)}
-                aria-describedby="service-error"
-                className={FIELD}
-                {...register("service")}
-              >
-                <option value="">اختر نوع الخدمة</option>
-                {SERVICES.map((service) => (
-                  <option key={service.slug} value={service.slug}>
-                    {service.title}
-                  </option>
-                ))}
-              </select>
-            </Field>
+              <option value="">اختر نوع الخدمة</option>
+              {SERVICES.map((service) => (
+                <option key={service.slug} value={service.slug}>
+                  {service.title}
+                </option>
+              ))}
+            </select>
+          </Field>
 
-            <Field
+          <Field
+            id="description"
+            label="وصف المشكلة أو المشروع"
+            required
+            error={errors.description?.message}
+          >
+            <textarea
               id="description"
-              label="وصف المشكلة أو المشروع"
-              required
-              error={errors.description?.message}
-            >
-              <textarea
-                id="description"
-                rows={5}
-                placeholder="اشرح لنا ما تحتاجه بالتفصيل: نوع العمل، المساحة التقريبية، أو وصف العطل ومتى بدأ."
-                aria-required="true"
-                aria-invalid={Boolean(errors.description)}
-                aria-describedby="description-error"
-                className={`${FIELD} resize-y`}
-                {...register("description")}
+              rows={5}
+              placeholder="اشرح لنا ما تحتاجه بالتفصيل: نوع العمل، المساحة التقريبية، أو وصف العطل ومتى بدأ."
+              aria-required="true"
+              aria-invalid={Boolean(errors.description)}
+              aria-describedby="description-error"
+              className={`${FIELD} resize-y`}
+              {...register("description")}
+            />
+          </Field>
+
+          <div>
+            <span className="block text-step--1 font-medium">
+              صور أو فيديو للموقع/العطل
+            </span>
+            <p id="attachments-hint" className="mt-1.5 text-step--1 text-muted">
+              يمكنك إرفاق صور أو فيديو للعطل أو المكان لمساعدتنا على فهم طلبك
+              (اختياري). حتى {MAX_FILES} ملفات، بحد أقصى {MAX_FILE_MB}{" "}
+              ميجابايت لكل ملف.
+            </p>
+
+            <div className="mt-3">
+              <input
+                id="attachments"
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                aria-describedby="attachments-hint attachments-error"
+                onChange={addFiles}
+                className="peer sr-only"
               />
-            </Field>
-
-            <div>
-              <span className="block text-step--1 font-medium">
-                صور أو فيديو للموقع/العطل
-              </span>
-              <p id="attachments-hint" className="mt-1.5 text-step--1 text-muted">
-                يمكنك إرفاق صور أو فيديو للعطل أو المكان لمساعدتنا على فهم طلبك
-                (اختياري). حتى {MAX_FILES} ملفات، بحد أقصى {MAX_FILE_MB}{" "}
-                ميجابايت لكل ملف.
-              </p>
-
-              <div className="mt-3">
-                <input
-                  id="attachments"
-                  type="file"
-                  multiple
-                  accept="image/*,video/*"
-                  aria-describedby="attachments-hint attachments-error"
-                  onChange={addFiles}
-                  className="peer sr-only"
-                />
-                <label
-                  htmlFor="attachments"
-                  className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-bg px-5 py-6 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
-                >
-                  <PlusIcon />
-                  إضافة صور أو فيديو
-                </label>
-              </div>
-
-              {attachments.length > 0 && (
-                <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {attachments.map((item) => (
-                    <li key={item.id} className="relative">
-                      {item.previewUrl ? (
-                        <span className="block aspect-square overflow-hidden rounded-lg border border-line">
-                          {/* Local object URL, so next/image adds nothing here. */}
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.previewUrl}
-                            alt={`معاينة ${item.file.name}`}
-                            className="h-full w-full object-cover"
-                          />
-                        </span>
-                      ) : (
-                        <span className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-line bg-bg p-3 text-center">
-                          <VideoIcon />
-                          <span className="line-clamp-2 text-step--1 break-all text-muted">
-                            {item.file.name}
-                          </span>
-                        </span>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => removeFile(item.id)}
-                        aria-label={`إزالة الملف ${item.file.name}`}
-                        className="absolute top-2 left-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface transition-colors duration-fast ease-out hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                      >
-                        <CloseIcon />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <p
-                id="attachments-error"
-                role="alert"
-                className="mt-1.5 min-h-5 text-step--1 text-danger"
+              <label
+                htmlFor="attachments"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-bg px-5 py-6 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
               >
-                {fileError}
-              </p>
+                <PlusIcon />
+                إضافة صور أو فيديو
+              </label>
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-bg p-4 transition-colors duration-fast ease-out has-[:checked]:border-accent">
-              <input
-                type="checkbox"
-                className="mt-1 h-5 w-5 shrink-0 accent-accent"
-                {...register("urgent")}
-              />
-              <span>
-                <span className="block text-step-0 font-medium">طلب عاجل</span>
-                <span className="mt-1 block text-step--1 text-muted">
-                  سنحاول ترتيب أقرب موعد ممكن لطلبك.
-                </span>
-              </span>
-            </label>
-          </FormSection>
+            {attachments.length > 0 && (
+              <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {attachments.map((item) => (
+                  <li key={item.id} className="relative">
+                    {item.previewUrl ? (
+                      <span className="block aspect-square overflow-hidden rounded-lg border border-line">
+                        {/* Local object URL, so next/image adds nothing here. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={item.previewUrl}
+                          alt={`معاينة ${item.file.name}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                    ) : (
+                      <span className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-line bg-bg p-3 text-center">
+                        <VideoIcon />
+                        <span className="line-clamp-2 text-step--1 break-all text-muted">
+                          {item.file.name}
+                        </span>
+                      </span>
+                    )}
 
-          <FormSection legend="الموقع">
-            <Field
-              id="city"
-              label="المدينة"
-              required
-              error={errors.city?.message}
-            >
-              <select
-                id="city"
-                aria-required="true"
-                aria-invalid={Boolean(errors.city)}
-                aria-describedby="city-error"
-                className={FIELD}
-                {...register("city")}
-              >
-                <option value="">اختر المدينة</option>
-                {CITIES.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(item.id)}
+                      aria-label={`إزالة الملف ${item.file.name}`}
+                      className="absolute top-2 left-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface transition-colors duration-fast ease-out hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    >
+                      <CloseIcon />
+                    </button>
+                  </li>
                 ))}
-              </select>
-            </Field>
+              </ul>
+            )}
 
-            <Field
-              id="district"
-              label="الحي"
-              required
-              error={errors.district?.message}
+            <p
+              id="attachments-error"
+              role="alert"
+              className="mt-1.5 min-h-5 text-step--1 text-danger"
             >
-              <input
-                id="district"
-                type="text"
-                placeholder="مثال: حي النرجس"
-                aria-required="true"
-                aria-invalid={Boolean(errors.district)}
-                aria-describedby="district-error"
-                className={FIELD}
-                {...register("district")}
-              />
-            </Field>
-
-            <Field
-              id="address"
-              label="العنوان التفصيلي"
-              hint="اختياري — الشارع، رقم المبنى، علامة مميزة قريبة."
-              error={errors.address?.message}
-            >
-              <textarea
-                id="address"
-                rows={3}
-                placeholder="الشارع، رقم المبنى، علامة مميزة قريبة..."
-                aria-describedby="address-hint address-error"
-                className={`${FIELD} resize-y`}
-                {...register("address")}
-              />
-            </Field>
-          </FormSection>
-
-          <FormSection legend="الموعد">
-            <Field
-              id="preferredAt"
-              label="الموعد المناسب"
-              hint="اختياري — الوقت الذي يناسبك للزيارة."
-              error={errors.preferredAt?.message}
-            >
-              <input
-                id="preferredAt"
-                type="datetime-local"
-                dir="ltr"
-                aria-describedby="preferredAt-hint preferredAt-error"
-                className={`${FIELD} text-right`}
-                {...register("preferredAt")}
-              />
-            </Field>
-
-            <Field
-              id="notes"
-              label="ملاحظات إضافية"
-              hint="اختياري — أي تفاصيل أخرى تودّ إخبارنا بها."
-              error={errors.notes?.message}
-            >
-              <textarea
-                id="notes"
-                rows={3}
-                aria-describedby="notes-hint notes-error"
-                className={`${FIELD} resize-y`}
-                {...register("notes")}
-              />
-            </Field>
-          </FormSection>
-
-          <div className="border-t border-line pt-8">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`${PRIMARY_CTA} w-full sm:w-auto`}
-            >
-              {isSubmitting ? "جارٍ الإرسال..." : "إرسال الطلب"}
-            </button>
-            <p className="mt-4 text-step--1 text-muted">
-              الحقول المعلَّمة بـ
-              <span aria-hidden className="text-accent">
-                {" * "}
-              </span>
-              مطلوبة.
+              {fileError}
             </p>
           </div>
-        </form>
-      </Reveal>
 
-      <Reveal delay={90}>
-        <aside
-          aria-label="لماذا تطلب من الفهدار"
-          className="lg:sticky lg:top-28"
-        >
-          <div className="rounded-2xl border border-line bg-surface p-7">
-            <h2 className="text-step-1 font-semibold tracking-tight">
-              لماذا تطلب من الفهدار
-            </h2>
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-line bg-bg p-4 transition-colors duration-fast ease-out has-[:checked]:border-accent">
+            <input
+              type="checkbox"
+              className="mt-1 h-5 w-5 shrink-0 accent-accent"
+              {...register("urgent")}
+            />
+            <span>
+              <span className="block text-step-0 font-medium">طلب عاجل</span>
+              <span className="mt-1 block text-step--1 text-muted">
+                سنحاول ترتيب أقرب موعد ممكن لطلبك.
+              </span>
+            </span>
+          </label>
+        </FormSection>
 
-            <ul className="mt-7 space-y-6">
-              {TRUST_POINTS.map((point) => (
-                <li key={point.title} className="flex items-start gap-4">
-                  {point.icon}
-                  <span>
-                    <span className="block text-step-0 font-medium">
-                      {point.title}
-                    </span>
-                    <span className="mt-1 block text-step--1 text-muted">
-                      {point.description}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            {/* TODO: real WhatsApp number in the contact phase. */}
-            <a
-              href="#"
-              className="mt-8 flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3.5 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        <FormSection legend="الموقع">
+          <Field
+            id="city"
+            label="المدينة"
+            required
+            error={errors.city?.message}
+          >
+            <select
+              id="city"
+              aria-required="true"
+              aria-invalid={Boolean(errors.city)}
+              aria-describedby="city-error"
+              className={FIELD}
+              {...register("city")}
             >
-              <Stroke className="h-5 w-5 shrink-0 text-accent">
-                <path d="M20.5 11.7a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.3-4.5A8.5 8.5 0 1 1 20.5 11.7Z" />
-                <path d="M9 9.4c.3 2.6 2.6 4.9 5.2 5.2.5 0 1-.4 1-1v-.7l-1.8-.6-.8.8a6.4 6.4 0 0 1-2.1-2.1l.8-.8-.6-1.8h-.7c-.6 0-1 .4-1 1Z" />
-              </Stroke>
-              تواصل عبر واتساب
-            </a>
-          </div>
-        </aside>
-      </Reveal>
-    </div>
+              <option value="">اختر المدينة</option>
+              {CITIES.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field
+            id="district"
+            label="الحي"
+            required
+            error={errors.district?.message}
+          >
+            <input
+              id="district"
+              type="text"
+              placeholder="مثال: حي النرجس"
+              aria-required="true"
+              aria-invalid={Boolean(errors.district)}
+              aria-describedby="district-error"
+              className={FIELD}
+              {...register("district")}
+            />
+          </Field>
+
+          <Field
+            id="address"
+            label="العنوان التفصيلي"
+            hint="اختياري — الشارع، رقم المبنى، علامة مميزة قريبة."
+            error={errors.address?.message}
+          >
+            <textarea
+              id="address"
+              rows={3}
+              placeholder="الشارع، رقم المبنى، علامة مميزة قريبة..."
+              aria-describedby="address-hint address-error"
+              className={`${FIELD} resize-y`}
+              {...register("address")}
+            />
+          </Field>
+        </FormSection>
+
+        <FormSection legend="الموعد">
+          <Field
+            id="preferredAt"
+            label="الموعد المناسب"
+            hint="اختياري — الوقت الذي يناسبك للزيارة."
+            error={errors.preferredAt?.message}
+          >
+            <input
+              id="preferredAt"
+              type="datetime-local"
+              dir="ltr"
+              aria-describedby="preferredAt-hint preferredAt-error"
+              className={`${FIELD} text-right`}
+              {...register("preferredAt")}
+            />
+          </Field>
+
+          <Field
+            id="notes"
+            label="ملاحظات إضافية"
+            hint="اختياري — أي تفاصيل أخرى تودّ إخبارنا بها."
+            error={errors.notes?.message}
+          >
+            <textarea
+              id="notes"
+              rows={3}
+              aria-describedby="notes-hint notes-error"
+              className={`${FIELD} resize-y`}
+              {...register("notes")}
+            />
+          </Field>
+        </FormSection>
+
+        <div className="border-t border-line pt-8">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`${PRIMARY_CTA} w-full sm:w-auto`}
+          >
+            {isSubmitting ? "جارٍ الإرسال..." : "إرسال الطلب"}
+          </button>
+          <p className="mt-4 text-step--1 text-muted">
+            الحقول المعلَّمة بـ
+            <span aria-hidden className="text-accent">
+              {" * "}
+            </span>
+            مطلوبة.
+          </p>
+        </div>
+      </form>
+    </Reveal>
   );
 }

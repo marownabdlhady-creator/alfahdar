@@ -8,12 +8,20 @@ import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
 
 const SCROLL_THRESHOLD = 80;
 
+/** The only route whose top is a dark hero the header can sit over.
+    Everywhere else the page starts light, so the header must be solid
+    from scroll position 0 or it disappears into the background. */
+const DARK_HERO_ROUTES = new Set(["/"]);
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
+
+  const hasDarkHero = DARK_HERO_ROUTES.has(pathname);
+  const solid = !hasDarkHero || scrolled;
 
   useEffect(() => {
     let ticking = false;
@@ -68,12 +76,14 @@ export function SiteHeader() {
         تخطي إلى المحتوى
       </a>
 
-      {/* Transparent over the dark hero, solid off-white once scrolled. */}
+      {/* Transparent only while sitting over a dark hero; solid off-white
+          once scrolled past it, and on every light-topped page from the
+          start. */}
       <header
         className={[
           "fixed inset-x-0 top-0 z-50 border-b",
           "transition-[background-color,color,border-color,box-shadow] duration-med ease-out",
-          scrolled
+          solid
             ? "border-line bg-bg text-ink shadow-[0_1px_24px_rgba(13,13,13,0.05)]"
             : "border-transparent bg-transparent text-ink-invert",
         ].join(" ")}
