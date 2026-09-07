@@ -2,9 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 
+import { scrollIntoViewSafely } from "@/lib/scroll";
 import {
   contactMessageSchema,
   type ContactMessageErrorResponse,
@@ -97,6 +98,24 @@ export function ContactForm() {
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  /* The success card is far shorter than the form it replaces, so it lands
+     above wherever the user was sitting when they hit submit — leaving them
+     staring at the footer. Both directions of the swap get a scroll. */
+  const successRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasSent = useRef(false);
+
+  useEffect(() => {
+    if (sent) {
+      wasSent.current = true;
+      scrollIntoViewSafely(successRef.current);
+    } else if (wasSent.current) {
+      /* Guarded, so a fresh page load never scrolls itself. */
+      wasSent.current = false;
+      scrollIntoViewSafely(formRef.current);
+    }
+  }, [sent]);
+
   const {
     register,
     handleSubmit,
@@ -162,7 +181,10 @@ export function ContactForm() {
 
   if (sent) {
     return (
-      <div className="rounded-2xl border border-line bg-surface p-6 text-center sm:p-10 lg:p-14">
+      <div
+        ref={successRef}
+        className="scroll-mt-28 rounded-2xl border border-line bg-surface p-6 text-center sm:p-10 lg:scroll-mt-32 lg:p-14"
+      >
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-accent">
           <CheckIcon />
         </span>
@@ -186,9 +208,10 @@ export function ContactForm() {
 
   return (
     <form
+      ref={formRef}
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="rounded-2xl border border-line bg-surface p-5 sm:p-8 lg:p-10"
+      className="scroll-mt-28 rounded-2xl border border-line bg-surface p-5 sm:p-8 lg:scroll-mt-32 lg:p-10"
     >
       <h2 className="text-step-1 font-semibold tracking-tight">
         أرسل لنا رسالة

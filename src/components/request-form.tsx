@@ -13,6 +13,7 @@ import {
   MAX_FILE_BYTES,
   MAX_FILE_MB,
 } from "@/lib/request-options";
+import { scrollIntoViewSafely } from "@/lib/scroll";
 import { categoryFromSlug } from "@/lib/service-category";
 import { SERVICES } from "@/lib/services";
 import {
@@ -184,6 +185,24 @@ export function RequestForm() {
   const [submitError, setSubmitError] = useState("");
   const [reference, setReference] = useState<string | null>(null);
 
+  /* The success card is far shorter than the form it replaces, so it lands
+     above wherever the user was sitting when they hit submit — leaving them
+     staring at the footer. Both directions of the swap get a scroll. */
+  const successRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const wasSuccessful = useRef(false);
+
+  useEffect(() => {
+    if (reference) {
+      wasSuccessful.current = true;
+      scrollIntoViewSafely(successRef.current);
+    } else if (wasSuccessful.current) {
+      /* Guarded, so a fresh page load never scrolls itself. */
+      wasSuccessful.current = false;
+      scrollIntoViewSafely(formRef.current);
+    }
+  }, [reference]);
+
   // TODO: wire real upload (Vercel Blob) in backend phase.
   const attachmentsRef = useRef<Attachment[]>([]);
   useEffect(() => {
@@ -333,7 +352,10 @@ export function RequestForm() {
   if (reference) {
     return (
       <Reveal>
-        <div className="rounded-2xl border border-line bg-surface p-6 text-center sm:p-10 lg:p-14">
+        <div
+          ref={successRef}
+          className="scroll-mt-28 rounded-2xl border border-line bg-surface p-6 text-center sm:p-10 lg:scroll-mt-32 lg:p-14"
+        >
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-accent">
             <Stroke className="h-8 w-8 text-accent">
               <path d="m5 12.6 4.4 4.4L19 7" />
@@ -370,9 +392,10 @@ export function RequestForm() {
   return (
     <Reveal>
       <form
+        ref={formRef}
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-9 rounded-2xl border border-line bg-surface p-5 sm:p-8 lg:p-10"
+        className="scroll-mt-28 space-y-9 rounded-2xl border border-line bg-surface p-5 sm:p-8 lg:scroll-mt-32 lg:p-10"
       >
         <FormSection legend="بياناتك">
           <Field
