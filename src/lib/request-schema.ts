@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { SAUDI_MOBILE_ERROR, isSaudiMobile } from "./phone";
 import { SERVICES } from "./services";
 
 /** Valid values for the "نوع الخدمة" select. */
@@ -19,11 +20,6 @@ export const CITIES = [
   "أخرى",
 ] as const;
 
-/** 05XXXXXXXX, +9665XXXXXXXX or 009665XXXXXXXX. */
-const SAUDI_MOBILE = /^(?:\+?966|00966)?0?5\d{8}$/;
-
-const stripSeparators = (value: string) => value.replace(/[\s()-]/g, "");
-
 /* Attachment limits. Enforced in the UI now; the same numbers apply
    server-side once uploads are wired. */
 export const MAX_FILES = 5;
@@ -37,10 +33,7 @@ export const requestSchema = z.object({
     .string()
     .trim()
     .min(1, "الرجاء إدخال رقم الجوال")
-    .refine(
-      (value) => SAUDI_MOBILE.test(stripSeparators(value)),
-      "رقم جوال غير صحيح. مثال: 0512345678 أو +966512345678",
-    ),
+    .refine(isSaudiMobile, SAUDI_MOBILE_ERROR),
   service: z
     .string()
     .refine(
