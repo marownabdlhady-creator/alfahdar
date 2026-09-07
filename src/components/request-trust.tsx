@@ -56,7 +56,7 @@ export function RequestTrust() {
   return (
     <aside
       aria-label="لماذا تطلب من الفهدار"
-      className="rounded-2xl border border-line bg-surface p-6 sm:p-7"
+      className="rounded-2xl border border-line bg-surface p-5 sm:p-7"
     >
       <h2 className="text-step-0 font-semibold tracking-tight">
         لماذا تطلب من الفهدار

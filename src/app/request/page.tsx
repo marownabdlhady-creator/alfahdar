@@ -15,14 +15,18 @@ export const metadata: Metadata = {
 export default function RequestPage() {
   return (
     <section className="bg-bg pt-28 pb-section lg:pt-32">
-      <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10">
         {/* The form is the page. On desktop it takes two of three columns
             and starts on the first row, so its opening fields sit above
             the fold; the compact intro and the trust panel stack in the
             narrow right column. On mobile the source order stands —
-            intro, form, trust — so the fields start high. */}
+            intro, form, trust — so the fields start high.
+
+            min-w-0 on every item: a grid item is min-width:auto by default,
+            so the single mobile column would be sized by the form's
+            min-content width and run off the edge of the screen. */}
         <div className="grid gap-8 lg:grid-cols-3 lg:items-start lg:gap-10">
-          <Reveal className="lg:col-start-1 lg:row-start-1">
+          <Reveal className="min-w-0 lg:col-start-1 lg:row-start-1">
             <div className="flex items-center gap-3">
               <span aria-hidden className="h-0.5 w-8 shrink-0 bg-accent" />
               <span className="text-step--1 tracking-[0.14em] text-muted">
@@ -39,7 +43,7 @@ export default function RequestPage() {
             </p>
           </Reveal>
 
-          <div className="lg:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="min-w-0 lg:col-span-2 lg:col-start-2 lg:row-span-2 lg:row-start-1">
             {/* useSearchParams (the ?service= preselect) needs a boundary. */}
             <Suspense
               fallback={
@@ -53,7 +57,7 @@ export default function RequestPage() {
             </Suspense>
           </div>
 
-          <Reveal delay={90} className="lg:col-start-1 lg:row-start-2">
+          <Reveal delay={90} className="min-w-0 lg:col-start-1 lg:row-start-2">
             <RequestTrust />
           </Reveal>
         </div>

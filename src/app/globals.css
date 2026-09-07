@@ -107,6 +107,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Form controls carry an intrinsic width — an <input>'s `size`, a
+   <select>'s widest <option>, the localized field placeholders a browser
+   draws inside a datetime input. That width becomes the min-content
+   contribution of every ancestor, which is what pushes a narrow layout
+   past the viewport. Let them shrink; `w-full` still sizes them. */
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
 ::selection {
   background-color: var(--color-accent);
   color: var(--color-ink-invert);

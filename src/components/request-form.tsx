@@ -22,13 +22,13 @@ import { SERVICES } from "@/lib/services";
 
 /* text-step-0 never drops below 16px, so iOS won't zoom on focus. */
 const FIELD =
-  "w-full rounded-lg border border-line bg-surface px-4 py-3 text-step-0 text-ink transition-colors duration-fast ease-out placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent aria-[invalid=true]:border-danger";
+  "block w-full min-w-0 max-w-full rounded-lg border border-line bg-surface px-3.5 py-3 text-step-0 text-ink transition-colors duration-fast ease-out placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent aria-[invalid=true]:border-danger sm:px-4";
 
 const PRIMARY_CTA =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-8 py-4 text-step--1 font-medium text-ink-invert transition-colors duration-fast ease-out hover:bg-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-step--1 font-medium text-ink-invert transition-colors duration-fast ease-out hover:bg-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60 sm:px-8";
 
 const SECONDARY_CTA =
-  "inline-flex items-center justify-center gap-2 rounded-full border border-line px-8 py-4 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent";
+  "inline-flex items-center justify-center gap-2 rounded-full border border-line px-6 py-4 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:px-8";
 
 /* --- Icons -------------------------------------------------------- */
 
@@ -137,7 +137,7 @@ function Field({
       <p
         id={`${id}-error`}
         role="alert"
-        className="mt-1.5 min-h-5 text-step--1 text-danger"
+        className="mt-1.5 min-h-5 text-step--1 break-words text-danger"
       >
         {error}
       </p>
@@ -283,7 +283,7 @@ export function RequestForm() {
   if (reference) {
     return (
       <Reveal>
-        <div className="rounded-2xl border border-line bg-surface p-9 text-center sm:p-14">
+        <div className="rounded-2xl border border-line bg-surface p-6 text-center sm:p-10 lg:p-14">
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-accent">
             <Stroke className="h-8 w-8 text-accent">
               <path d="m5 12.6 4.4 4.4L19 7" />
@@ -297,7 +297,7 @@ export function RequestForm() {
             سيتواصل معك فريق الفهدار في أقرب وقت.
           </p>
 
-          <p className="mt-7 inline-flex flex-col items-center gap-1 rounded-xl border border-line px-7 py-4">
+          <p className="mt-7 inline-flex max-w-full flex-col items-center gap-1 rounded-xl border border-line px-6 py-4 sm:px-7">
             <span className="text-step--1 text-muted">رقم الطلب</span>
             <span dir="ltr" className="text-step-1 font-semibold tracking-wide">
               {reference}
@@ -322,7 +322,7 @@ export function RequestForm() {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-9 rounded-2xl border border-line bg-surface p-7 sm:p-10"
+        className="space-y-9 rounded-2xl border border-line bg-surface p-5 sm:p-8 lg:p-10"
       >
         <FormSection legend="بياناتك">
           <Field
@@ -430,7 +430,7 @@ export function RequestForm() {
               />
               <label
                 htmlFor="attachments"
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-bg px-5 py-6 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-bg px-4 py-6 text-center text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
               >
                 <PlusIcon />
                 إضافة صور أو فيديو
@@ -440,7 +440,7 @@ export function RequestForm() {
             {attachments.length > 0 && (
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {attachments.map((item) => (
-                  <li key={item.id} className="relative">
+                  <li key={item.id} className="relative min-w-0">
                     {item.previewUrl ? (
                       <span className="block aspect-square overflow-hidden rounded-lg border border-line">
                         {/* Local object URL, so next/image adds nothing here. */}
@@ -476,7 +476,7 @@ export function RequestForm() {
             <p
               id="attachments-error"
               role="alert"
-              className="mt-1.5 min-h-5 text-step--1 text-danger"
+              className="mt-1.5 min-h-5 text-step--1 break-words text-danger"
             >
               {fileError}
             </p>
