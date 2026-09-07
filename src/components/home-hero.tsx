@@ -18,14 +18,9 @@ const SLIDES = [
 const HOLD_MS = 5500;
 /** Cross-fade length; it overlaps the front of the incoming slide's hold. */
 const FADE_MS = 1600;
-/** A slide is on screen from the moment it activates until the fade ends. */
-const ZOOM_MS = HOLD_MS + FADE_MS;
 
 export function HomeHero() {
   const [index, setIndex] = useState(0);
-  // Off until after the first paint, so slide 0 has a scale(1) frame to
-  // transition away from — otherwise it would mount already zoomed.
-  const [inMotion, setInMotion] = useState(false);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -35,12 +30,10 @@ export function HomeHero() {
       window.clearInterval(timer);
 
       if (reduced.matches) {
-        setInMotion(false);
         setIndex(0);
         return;
       }
 
-      setInMotion(true);
       timer = window.setInterval(
         () => setIndex((current) => (current + 1) % SLIDES.length),
         HOLD_MS,
@@ -61,7 +54,6 @@ export function HomeHero() {
       {/* --- Cross-fading backdrop ------------------------------------ */}
       {SLIDES.map((src, i) => {
         const active = i === index;
-        const zooming = active && inMotion;
 
         return (
           <div
@@ -74,28 +66,16 @@ export function HomeHero() {
               transitionDuration: `${FADE_MS}ms`,
             }}
           >
-            {/* Ken Burns. The idle state carries a delay rather than a
-                duration, so an outgoing slide snaps back to scale(1)
-                only once it is fully invisible. */}
-            <div
-              className="relative h-full w-full will-change-transform"
-              style={{
-                transform: zooming ? "scale(1.08)" : "scale(1)",
-                transitionProperty: "transform",
-                transitionTimingFunction: "linear",
-                transitionDuration: zooming ? `${ZOOM_MS}ms` : "0ms",
-                transitionDelay: zooming ? "0ms" : `${FADE_MS}ms`,
-              }}
-            >
-              <Image
-                src={src}
-                alt="من أعمال الفهدار"
-                fill
-                sizes="100vw"
-                preload={i === 0}
-                className="object-cover object-center"
-              />
-            </div>
+            {/* No transform of any kind: the photo shows the full cover
+                crop, nothing pushed further out of frame. */}
+            <Image
+              src={src}
+              alt="من أعمال الفهدار"
+              fill
+              sizes="100vw"
+              preload={i === 0}
+              className="object-cover object-center"
+            />
           </div>
         );
       })}
