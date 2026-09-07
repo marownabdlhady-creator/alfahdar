@@ -1,6 +1,14 @@
 import Link from "next/link";
 
-import { BRAND, CTA, NAV_LINKS, SERVICE_LINKS } from "@/lib/nav";
+import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
+import { SERVICES } from "@/lib/services";
+
+/* The footer service list reads the catalogue directly, so a new category
+   appears here without a second edit. */
+const SERVICE_LINKS = SERVICES.map((service) => ({
+  label: service.title,
+  href: service.href,
+}));
 
 const CONTACT_ITEMS = [
   { label: "هاتف", value: "الهاتف قريباً", href: "#" },

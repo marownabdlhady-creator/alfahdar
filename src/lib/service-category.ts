@@ -6,6 +6,7 @@ export const SERVICE_CATEGORIES = [
   "TECHNICAL",
   "MAINTENANCE",
   "SUPPLY",
+  "CLEANING",
 ] as const;
 
 export type ServiceCategoryValue = (typeof SERVICE_CATEGORIES)[number];
@@ -19,11 +20,12 @@ export const CATEGORY_BY_SLUG = {
   technical: "TECHNICAL",
   maintenance: "MAINTENANCE",
   supply: "SUPPLY",
+  cleaning: "CLEANING",
 } as const satisfies Record<string, ServiceCategoryValue>;
 
 export type ServiceSlug = keyof typeof CATEGORY_BY_SLUG;
 
-/** null for anything that isn't one of the five slugs. */
+/** null for anything that isn't a known service slug. */
 export function categoryFromSlug(slug: string): ServiceCategoryValue | null {
   return slug in CATEGORY_BY_SLUG
     ? CATEGORY_BY_SLUG[slug as ServiceSlug]

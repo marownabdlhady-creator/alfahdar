@@ -11,12 +11,12 @@ import { absoluteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
 
-/** Pre-render all five categories at build time. */
+/** Pre-render every category at build time. */
 export function generateStaticParams() {
   return SERVICES.map((service) => ({ slug: service.slug }));
 }
 
-/** Anything outside the five slugs is a 404, never an on-demand render. */
+/** Anything outside the catalogue slugs is a 404, never an on-demand render. */
 export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -430,7 +430,7 @@ export default async function ServiceDetailPage({ params }: Params) {
             </h2>
           </Reveal>
 
-          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {others.map((other, index) => (
               <li key={other.slug}>
                 <Reveal delay={index * 60} className="h-full">

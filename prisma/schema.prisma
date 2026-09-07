@@ -16,13 +16,14 @@ datasource db {
 // Enums
 // ---------------------------------------------------------------------
 
-/// The five service categories. Values mirror the slugs the front end uses.
+/// The service categories. Values mirror the slugs the front end uses.
 enum ServiceCategory {
   CONSTRUCTION
   FINISHING
   TECHNICAL
   MAINTENANCE
   SUPPLY
+  CLEANING
 }
 
 /// The lifecycle of a service request:

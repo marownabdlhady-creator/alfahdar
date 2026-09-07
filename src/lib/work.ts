@@ -12,7 +12,7 @@ export type WorkItem = {
   alt: string;
   /** Short Arabic project title, shown on the tile and in the lightbox. */
   title: string;
-  /** One of the five service slugs. */
+  /** One of the service slugs in src/lib/services.ts. */
   category: string;
 };
 
@@ -22,7 +22,7 @@ export const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(
   SERVICES.map((service) => [service.slug, service.title]),
 );
 
-/** The filter bar: "الكل" followed by the five categories, in site order. */
+/** The filter bar: "الكل" followed by every category, in site order. */
 export const WORK_FILTERS = [
   { slug: "all", label: "الكل" },
   ...SERVICES.map((service) => ({ slug: service.slug, label: service.title })),
@@ -116,5 +116,14 @@ export const WORK_ITEMS: WorkItem[] = [
     title: "بناء سور وواجهة",
     alt: "الفهدار — أعمال بناء سور خارجي وواجهة لمشروع سكني.",
     category: "construction",
+  },
+  {
+    id: "w-10",
+    src: "/services/cleaning.jpg",
+    width: 1600,
+    height: 1067,
+    title: "تنظيف وتعقيم شامل",
+    alt: "الفهدار — أعمال تنظيف وتعقيم شامل لمرافق سكنية.",
+    category: "cleaning",
   },
 ];

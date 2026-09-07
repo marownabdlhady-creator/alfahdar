@@ -8,11 +8,18 @@ import { SERVICES } from "@/lib/services";
 export const metadata: Metadata = {
   title: "خدماتنا | الفهدار",
   description:
-    "حلول متكاملة في المقاولات والبناء، التشطيبات، الأعمال الفنية، الصيانة وتوريد المواد.",
+    "حلول متكاملة في المقاولات والبناء، التشطيبات، الأعمال الفنية، الصيانة، توريد المواد وخدمات النظافة والتنظيف.",
 };
 
-/* Editorial index per block, in Arabic-Indic numerals. */
-const INDEX_LABELS = ["٠١", "٠٢", "٠٣", "٠٤", "٠٥"] as const;
+/* Editorial index per block, in Arabic-Indic numerals, derived from the
+   catalogue so a new category numbers itself. */
+const ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+
+function indexLabel(index: number) {
+  return String(index + 1)
+    .padStart(2, "0")
+    .replace(/[0-9]/g, (digit) => ARABIC_DIGITS[Number(digit)]);
+}
 
 const PRIMARY_CTA =
   "inline-flex items-center gap-2 rounded-full bg-ink px-8 py-3.5 text-step--1 font-medium text-ink-invert transition-colors duration-fast ease-out hover:bg-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent";
@@ -67,7 +74,8 @@ export default function ServicesPage() {
 
             <p className="mt-6 max-w-[58ch] text-step-0 text-muted">
               نقدّم حلولاً متكاملة لكل ما يخص المقاولات، البناء، التشطيبات،
-              الصيانة والخدمات الفنية — بجودة واحترافية وفريق مختص لكل تخصص.
+              الصيانة، الخدمات الفنية والنظافة — بجودة واحترافية وفريق مختص
+              لكل تخصص.
             </p>
           </Reveal>
 
@@ -108,7 +116,7 @@ export default function ServicesPage() {
                             aria-hidden
                             className="text-step--1 tracking-[0.14em] text-muted"
                           >
-                            {INDEX_LABELS[index]}
+                            {indexLabel(index)}
                           </span>
                         </div>
 

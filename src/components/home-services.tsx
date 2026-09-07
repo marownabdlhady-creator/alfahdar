@@ -4,15 +4,20 @@ import Link from "next/link";
 import { SERVICES, type Service } from "@/lib/services";
 
 /* The asymmetric desktop grid, expressed once per card. The featured
-   card holds a tall 7-column cell; the rest fill the remainder as
-   two stacked and two wide. Tablet drops to full-width + 2-up. */
+   card holds a tall 7-column cell, the next two stack beside it, and the
+   rest run as an even three-up row. Tablet drops to full-width + 2-up.
+   Any card past the listed cells falls back to the three-up cell, so the
+   grid keeps working when the catalogue grows. */
 const CELLS = [
   "md:col-span-12 lg:col-span-7 lg:row-span-2",
   "md:col-span-6 lg:col-span-5",
   "md:col-span-6 lg:col-span-5",
-  "md:col-span-6 lg:col-span-6",
-  "md:col-span-6 lg:col-span-6",
+  "md:col-span-6 lg:col-span-4",
+  "md:col-span-6 lg:col-span-4",
+  "md:col-span-6 lg:col-span-4",
 ] as const;
+
+const FALLBACK_CELL = "md:col-span-6 lg:col-span-4";
 
 const SIZES_FEATURED = "(min-width: 1024px) 58vw, 100vw";
 const SIZES_STANDARD =
@@ -134,8 +139,8 @@ export function HomeServices() {
         </h2>
 
         <p className="mt-5 max-w-[52ch] text-step-0 text-muted">
-          من المقاولات والبناء إلى التشطيبات والصيانة والخدمات الفنية — فريق
-          واحد يتكفّل بكل التفاصيل.
+          من المقاولات والبناء إلى التشطيبات والصيانة والخدمات الفنية والنظافة —
+          فريق واحد يتكفّل بكل التفاصيل.
         </p>
 
         <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-12 lg:auto-rows-[minmax(17rem,auto)] lg:gap-6">
@@ -144,7 +149,7 @@ export function HomeServices() {
               key={service.slug}
               service={service}
               featured={index === 0}
-              className={CELLS[index]}
+              className={CELLS[index] ?? FALLBACK_CELL}
             />
           ))}
         </div>
