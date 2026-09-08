@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 
 import { Reveal } from "@/components/reveal";
 import { WorkGallery } from "@/components/work-gallery";
-import { WORK_ITEMS } from "@/lib/work";
+import { prisma } from "@/lib/prisma";
+import { CATEGORY_LABELS_AR, SLUG_BY_CATEGORY } from "@/lib/service-category";
+import type { WorkItem } from "@/lib/work";
+import { workImageSize } from "@/lib/work-image";
 
 export const metadata: Metadata = {
   title: "معرض أعمالنا | الفهدار",
@@ -19,7 +22,39 @@ export const metadata: Metadata = {
   alternates: { canonical: "/work" },
 };
 
-export default function WorkPage() {
+/* The dashboard revalidates this path on every gallery mutation, so a new
+   photo appears as soon as it is saved. The hourly figure is only a
+   backstop for a revalidation that never arrived. */
+export const revalidate = 3600;
+
+/** The published gallery, in the shape the client component has always
+    taken. Pixel sizes come from src/lib/work-image.ts; the alt text is
+    built from the title and the category, the two things a row stores. */
+async function getWorkItems(): Promise<WorkItem[]> {
+  const rows = await prisma.workItem.findMany({
+    where: { isPublished: true },
+    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      imageUrl: true,
+    },
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    src: row.imageUrl,
+    ...workImageSize(row.imageUrl),
+    title: row.title,
+    alt: `الفهدار — ${row.title}، ${CATEGORY_LABELS_AR[row.category]}.`,
+    category: SLUG_BY_CATEGORY[row.category],
+  }));
+}
+
+export default async function WorkPage() {
+  const items = await getWorkItems();
+
   return (
     /* No dark hero on this page, so it clears the fixed header itself. */
     <section aria-labelledby="work-title" className="bg-bg pt-28 pb-section lg:pt-32">
@@ -43,7 +78,7 @@ export default function WorkPage() {
         </Reveal>
 
         <div className="mt-9 min-w-0 lg:mt-12">
-          <WorkGallery items={WORK_ITEMS} />
+          <WorkGallery items={items} />
         </div>
       </div>
     </section>

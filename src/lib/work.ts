@@ -28,13 +28,15 @@ export const WORK_FILTERS = [
   ...SERVICES.map((service) => ({ slug: service.slug, label: service.title })),
 ];
 
-/* TODO: replace static gallery data with dashboard/DB source in backend
-   phase. The photos in /public are temporary stand-ins, and the titles and
-   alt text are placeholder copy — everything a row needs is already in the
-   WorkItem shape, so swapping the source is a one-line change in the page.
+/* The gallery the site shipped with. /work no longer reads this — it
+   reads the WorkItem table the dashboard manages — but the array is not
+   dead: prisma/seed.ts turns it into the first rows of an empty gallery,
+   and src/lib/work-image.ts reads the pixel sizes back out of it for the
+   /public photos those rows point at.
 
    Order is hand-mixed: categories and portrait/landscape ratios alternate,
-   so the unfiltered masonry reads well in every column count. */
+   so the unfiltered masonry reads well in every column count. `order` on
+   the seeded rows follows this array, which is what preserves it. */
 export const WORK_ITEMS: WorkItem[] = [
   {
     id: "w-01",
