@@ -24,6 +24,7 @@ enum ServiceCategory {
   MAINTENANCE
   SUPPLY
   CLEANING
+  ENGINEERING
 }
 
 /// The lifecycle of a service request:

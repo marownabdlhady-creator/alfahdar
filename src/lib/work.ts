@@ -55,6 +55,15 @@ export const WORK_ITEMS: WorkItem[] = [
     category: "finishing",
   },
   {
+    id: "w-11",
+    src: "/engineering-3.jpg",
+    width: 1200,
+    height: 1600,
+    title: "تصميم معماري لفيلا",
+    alt: "الفهدار — تصميم معماري ثلاثي الأبعاد لفيلا سكنية بواجهة عصرية.",
+    category: "engineering",
+  },
+  {
     id: "w-03",
     src: "/fahdar6.jpeg",
     width: 1280,
@@ -71,6 +80,15 @@ export const WORK_ITEMS: WorkItem[] = [
     title: "تركيب أرضيات رخام",
     alt: "الفهدار — تركيب أرضيات رخام في مدخل فيلا سكنية.",
     category: "finishing",
+  },
+  {
+    id: "w-12",
+    src: "/engineering-4.jpg",
+    width: 1600,
+    height: 1151,
+    title: "مخطط معماري",
+    alt: "الفهدار — مخطط معماري تفصيلي لتوزيع مساحات مشروع سكني.",
+    category: "engineering",
   },
   {
     id: "w-05",
@@ -91,6 +109,15 @@ export const WORK_ITEMS: WorkItem[] = [
     category: "maintenance",
   },
   {
+    id: "w-13",
+    src: "/engineering-2.jpg",
+    width: 720,
+    height: 1280,
+    title: "تصميم واجهة",
+    alt: "الفهدار — تصميم واجهة خارجية لمبنى بمواد وتشطيبات مختارة.",
+    category: "engineering",
+  },
+  {
     id: "w-07",
     src: "/fahdar2.jpg",
     width: 896,
@@ -109,6 +136,15 @@ export const WORK_ITEMS: WorkItem[] = [
     category: "supply",
   },
   {
+    id: "w-14",
+    src: "/engineering-5.jpg",
+    width: 1200,
+    height: 1600,
+    title: "تصميم داخلي",
+    alt: "الفهدار — تصميم داخلي لمساحة معيشة بتوزيع أثاث وإضاءة مدروسة.",
+    category: "engineering",
+  },
+  {
     id: "w-09",
     src: "/fahdar5.jpeg",
     width: 720,
@@ -125,5 +161,14 @@ export const WORK_ITEMS: WorkItem[] = [
     title: "تنظيف وتعقيم شامل",
     alt: "الفهدار — أعمال تنظيف وتعقيم شامل لمرافق سكنية.",
     category: "cleaning",
+  },
+  {
+    id: "w-15",
+    src: "/engineering-6.jpg",
+    width: 960,
+    height: 1280,
+    title: "مخطط إنشائي",
+    alt: "الفهدار — مخطط إنشائي يوضح تفاصيل الأعمدة والأساسات للمشروع.",
+    category: "engineering",
   },
 ];

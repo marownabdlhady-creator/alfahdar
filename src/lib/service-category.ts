@@ -7,6 +7,7 @@ export const SERVICE_CATEGORIES = [
   "MAINTENANCE",
   "SUPPLY",
   "CLEANING",
+  "ENGINEERING",
 ] as const;
 
 export type ServiceCategoryValue = (typeof SERVICE_CATEGORIES)[number];
@@ -21,6 +22,7 @@ export const CATEGORY_BY_SLUG = {
   maintenance: "MAINTENANCE",
   supply: "SUPPLY",
   cleaning: "CLEANING",
+  engineering: "ENGINEERING",
 } as const satisfies Record<string, ServiceCategoryValue>;
 
 export type ServiceSlug = keyof typeof CATEGORY_BY_SLUG;
