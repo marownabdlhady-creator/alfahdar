@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 /** The dashboard is a separate app shell: no public header, footer or
     WhatsApp button, and nothing here should ever reach a search index.
-    Real dashboard chrome (sidebar, top bar) arrives with the dashboard
-    itself; this stays deliberately bare for now. */
+    Deliberately bare — the chrome (sidebar, top bar) belongs to the
+    (dashboard) group, so /admin/login keeps a clean full-page form. */
 export const metadata: Metadata = {
   title: "لوحة التحكم | الفهدار",
   robots: { index: false, follow: false, nocache: true },

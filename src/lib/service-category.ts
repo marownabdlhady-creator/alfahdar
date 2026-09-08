@@ -1,3 +1,5 @@
+import { SERVICES } from "@/lib/services";
+
 /** The ServiceCategory enum values, mirroring prisma/schema.prisma. Kept as
     plain literals so client bundles never pull in @prisma/client. */
 export const SERVICE_CATEGORIES = [
@@ -26,6 +28,16 @@ export const CATEGORY_BY_SLUG = {
 } as const satisfies Record<string, ServiceCategoryValue>;
 
 export type ServiceSlug = keyof typeof CATEGORY_BY_SLUG;
+
+/** enum value → the Arabic category name, read straight from the service
+    catalogue so the dashboard can never label a row differently from the
+    public site. */
+export const CATEGORY_LABELS_AR = Object.fromEntries(
+  SERVICES.map((service) => [
+    CATEGORY_BY_SLUG[service.slug as ServiceSlug],
+    service.title,
+  ]),
+) as Record<ServiceCategoryValue, string>;
 
 /** null for anything that isn't a known service slug. */
 export function categoryFromSlug(slug: string): ServiceCategoryValue | null {

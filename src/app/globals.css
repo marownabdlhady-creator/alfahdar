@@ -22,6 +22,15 @@
      enough to clear AA on --color-bg and --color-surface. */
   --color-danger: #a32b1c;
 
+  /* Dashboard only: one hue per request status, so a list of requests
+     reads at a glance. Desaturated to sit with the palette and dark
+     enough to clear AA on --color-surface. CONTACTED reuses the accent
+     and CANCELLED the muted grey, so only four new values are needed. */
+  --color-status-new: #2b6a8a;
+  --color-status-scheduled: #5b4b8a;
+  --color-status-progress: #a35a12;
+  --color-status-done: #2f6b45;
+
   /* --- Fonts (values injected by next/font in layout.tsx) ----- */
   --font-sans: var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
