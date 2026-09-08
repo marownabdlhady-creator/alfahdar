@@ -11,6 +11,7 @@ const SLIDES = [
   "/fahdar1.jpeg",
   "/fahdar2.jpg",
   "/fahdar3.jpg",
+  "/fahdar11.jpeg",
 ] as const;
 
 /** How long a slide is held before the next one starts fading in. */
