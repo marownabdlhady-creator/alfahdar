@@ -29,6 +29,7 @@ const SECTION_TITLES: { href: string; title: string }[] = [
 
 export function adminSectionTitle(pathname: string) {
   if (/^\/admin\/requests\/[^/]+$/.test(pathname)) return "تفاصيل الطلب";
+  if (/^\/admin\/messages\/[^/]+$/.test(pathname)) return "تفاصيل الرسالة";
 
   const section = SECTION_TITLES.find(
     (entry) => pathname === entry.href || pathname.startsWith(`${entry.href}/`),

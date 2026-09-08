@@ -23,11 +23,14 @@ function StatCard({
   value,
   href,
   emphasis = false,
+  hint,
 }: {
   label: string;
   value: number;
   href: string;
   emphasis?: boolean;
+  /** A second line under the number, for a breakdown worth one glance. */
+  hint?: string;
 }) {
   return (
     <Link
@@ -41,27 +44,30 @@ function StatCard({
       <span className="mt-3 text-step-3 font-bold tracking-tight tabular-nums">
         {value}
       </span>
+      {hint && <span className="mt-1 text-step--1 text-muted">{hint}</span>}
     </Link>
   );
 }
 
 export default async function AdminOverviewPage() {
-  const [requestsTotal, byStatus, messagesTotal, recent] = await Promise.all([
-    prisma.serviceRequest.count(),
-    prisma.serviceRequest.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.contactMessage.count(),
-    prisma.serviceRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        requestNumber: true,
-        fullName: true,
-        city: true,
-        status: true,
-      },
-    }),
-  ]);
+  const [requestsTotal, byStatus, messagesTotal, newMessages, recent] =
+    await Promise.all([
+      prisma.serviceRequest.count(),
+      prisma.serviceRequest.groupBy({ by: ["status"], _count: { _all: true } }),
+      prisma.contactMessage.count(),
+      prisma.contactMessage.count({ where: { status: "NEW" } }),
+      prisma.serviceRequest.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          requestNumber: true,
+          fullName: true,
+          city: true,
+          status: true,
+        },
+      }),
+    ]);
 
   const counts = emptyCounts();
   for (const row of byStatus) counts[row.status] = row._count._all;
@@ -96,7 +102,8 @@ export default async function AdminOverviewPage() {
           <StatCard
             label="رسائل التواصل"
             value={messagesTotal}
-            href="/admin/messages"
+            href={newMessages > 0 ? "/admin/messages?status=NEW" : "/admin/messages"}
+            hint={newMessages > 0 ? `منها ${newMessages} جديدة` : undefined}
           />
         </div>
       </section>

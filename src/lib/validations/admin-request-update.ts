@@ -24,15 +24,3 @@ export const adminRequestUpdateSchema = z
   );
 
 export type AdminRequestUpdateValues = z.infer<typeof adminRequestUpdateSchema>;
-
-/** What the PATCH route answers with on success, and what the client
-    components use to re-render without a round trip to the page. */
-export type AdminRequestUpdateResponse = {
-  success: true;
-  request: {
-    id: string;
-    status: (typeof REQUEST_STATUSES)[number];
-    adminNotes: string | null;
-    updatedAt: string;
-  };
-};

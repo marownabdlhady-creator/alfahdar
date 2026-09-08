@@ -3,11 +3,16 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AdminNotesForm } from "@/components/admin/admin-notes-form";
-import { RequestStatusControl } from "@/components/admin/request-status-control";
 import { StatusBadge, UrgentTag } from "@/components/admin/status-badge";
+import { StatusControl } from "@/components/admin/status-control";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { telHref, whatsappHref } from "@/lib/phone";
 import { prisma } from "@/lib/prisma";
+import {
+  REQUEST_STATUSES,
+  REQUEST_STATUS_BADGE,
+  REQUEST_STATUS_LABELS,
+} from "@/lib/request-status";
 import { CATEGORY_LABELS_AR } from "@/lib/service-category";
 
 /** The status and notes change from this very page; never cache it. */
@@ -173,9 +178,14 @@ export default async function AdminRequestDetailPage({
         </Panel>
 
         <Panel title="إدارة الطلب">
-          <RequestStatusControl
-            requestId={request.id}
+          <StatusControl
+            endpoint={`/api/admin/requests/${request.id}`}
+            statuses={REQUEST_STATUSES}
+            labels={REQUEST_STATUS_LABELS}
+            badges={REQUEST_STATUS_BADGE}
             initialStatus={request.status}
+            legend="حالة الطلب"
+            errorMessage="تعذّر تحديث حالة الطلب."
           />
 
           <div className="mt-6 border-t border-line pt-6">
