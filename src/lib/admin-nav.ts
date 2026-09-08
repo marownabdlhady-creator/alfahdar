@@ -12,6 +12,7 @@ export const ADMIN_NAV: AdminNavLink[] = [
   { label: "طلبات الخدمة", href: "/admin/requests", match: "prefix" },
   { label: "رسائل التواصل", href: "/admin/messages", match: "prefix" },
   { label: "معرض الأعمال", href: "/admin/work", match: "prefix" },
+  { label: "التقييمات", href: "/admin/reviews", match: "prefix" },
 ];
 
 export function isActiveAdminLink(link: AdminNavLink, pathname: string) {
@@ -26,6 +27,7 @@ const SECTION_TITLES: { href: string; title: string }[] = [
   { href: "/admin/requests", title: "طلبات الخدمة" },
   { href: "/admin/messages", title: "رسائل التواصل" },
   { href: "/admin/work", title: "معرض الأعمال" },
+  { href: "/admin/reviews", title: "التقييمات" },
   { href: "/admin", title: "نظرة عامة" },
 ];
 

@@ -50,12 +50,19 @@ function StatCard({
 }
 
 export default async function AdminOverviewPage() {
-  const [requestsTotal, byStatus, messagesTotal, newMessages, recent] =
-    await Promise.all([
+  const [
+    requestsTotal,
+    byStatus,
+    messagesTotal,
+    newMessages,
+    pendingReviews,
+    recent,
+  ] = await Promise.all([
       prisma.serviceRequest.count(),
       prisma.serviceRequest.groupBy({ by: ["status"], _count: { _all: true } }),
       prisma.contactMessage.count(),
       prisma.contactMessage.count({ where: { status: "NEW" } }),
+      prisma.review.count({ where: { isApproved: false } }),
       prisma.serviceRequest.findMany({
         orderBy: { createdAt: "desc" },
         take: 5,
@@ -82,7 +89,7 @@ export default async function AdminOverviewPage() {
           أرقام مباشرة من قاعدة البيانات.
         </p>
 
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
           <StatCard
             label="إجمالي الطلبات"
             value={requestsTotal}
@@ -104,6 +111,11 @@ export default async function AdminOverviewPage() {
             value={messagesTotal}
             href={newMessages > 0 ? "/admin/messages?status=NEW" : "/admin/messages"}
             hint={newMessages > 0 ? `منها ${newMessages} جديدة` : undefined}
+          />
+          <StatCard
+            label="تقييمات بانتظار المراجعة"
+            value={pendingReviews}
+            href="/admin/reviews?status=pending"
           />
         </div>
       </section>

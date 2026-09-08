@@ -1,71 +1,29 @@
 import { Reveal } from "@/components/reveal";
+import { ReviewForm } from "@/components/review-form";
+import { ReviewStars } from "@/components/review-stars";
 import { SectionHeading } from "@/components/section-heading";
+import { prisma } from "@/lib/prisma";
 
-type Review = {
-  /** Whole stars out of 5. */
-  rating: number;
-  quote: string;
-  name: string;
-  service: string;
-};
+/** Two rows of four at most. Newest first, so a fresh approval leads. */
+const MAX_REVIEWS = 6;
 
-// TODO: replace with real reviews (from client / dashboard)
-const REVIEWS: Review[] = [
-  {
-    rating: 5,
-    quote:
-      "طلبت تشطيب فيلا وكانت المتابعة ممتازة من أول يوم. التزموا بالجدول، والتسليم كان أنظف مما توقعت.",
-    name: "عبدالله الشمري",
-    service: "تشطيب فيلا",
-  },
-  {
-    rating: 5,
-    quote:
-      "تواصلت معهم لصيانة المكيفات في عز الصيف، وجاء الفني في نفس اليوم وأنهى العمل بسرعة وبالسعر المتفق عليه.",
-    name: "نورة العتيبي",
-    service: "صيانة مكيفات",
-  },
-  {
-    rating: 4,
-    quote:
-      "نفّذوا تركيب الرخام في المدخل والدرج بدقة عالية. التشطيب النهائي مرتب، والفريق محترم في التعامل.",
-    name: "فهد القحطاني",
-    service: "تركيب رخام",
-  },
-  {
-    rating: 5,
-    quote:
-      "أكثر ما يميزهم الوضوح في السعر. استلمت عرضاً مفصّلاً قبل البدء، ولم يُضَف أي مبلغ بعد ذلك.",
-    name: "سارة الدوسري",
-    service: "ترميم وصيانة عامة",
-  },
-];
+export async function HomeReviews() {
+  /* Only what an admin has approved ever reaches this page: a submission
+     lands with isApproved false and stays out of this query until the
+     dashboard flips it. */
+  const reviews = await prisma.review.findMany({
+    where: { isApproved: true },
+    orderBy: { createdAt: "desc" },
+    take: MAX_REVIEWS,
+    select: {
+      id: true,
+      clientName: true,
+      serviceLabel: true,
+      rating: true,
+      comment: true,
+    },
+  });
 
-const TOTAL_STARS = 5;
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <div
-      role="img"
-      aria-label={`التقييم ${rating} من ${TOTAL_STARS}`}
-      className="flex items-center gap-1"
-    >
-      {Array.from({ length: TOTAL_STARS }, (_, index) => (
-        <svg
-          key={index}
-          aria-hidden
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          className={`h-4 w-4 ${index < rating ? "text-accent" : "text-line"}`}
-        >
-          <path d="M10 1.6 12.4 6.7l5.6.8-4.1 3.9 1 5.5-4.9-2.6-4.9 2.6 1-5.5L2 7.5l5.6-.8L10 1.6Z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
-
-export function HomeReviews() {
   return (
     <section
       id="reviews"
@@ -82,30 +40,44 @@ export function HomeReviews() {
           />
         </Reveal>
 
-        <ul className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-          {REVIEWS.map((review, index) => (
-            <li key={review.name}>
-              <Reveal delay={index * 80} className="h-full">
-                <figure className="flex h-full flex-col rounded-xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(13,13,13,0.03)]">
-                  <Stars rating={review.rating} />
+        {reviews.length === 0 ? (
+          <Reveal>
+            {/* Nothing approved yet. An empty grid would read as a fault,
+                so the section asks for the first review instead. */}
+            <p className="mt-14 rounded-xl border border-line bg-surface px-6 py-12 text-center text-step-0 text-muted">
+              كن أول من يشاركنا رأيه في خدمات الفهدار.
+            </p>
+          </Reveal>
+        ) : (
+          <ul className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+            {reviews.map((review, index) => (
+              <li key={review.id}>
+                <Reveal delay={index * 80} className="h-full">
+                  <figure className="flex h-full flex-col rounded-xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(13,13,13,0.03)]">
+                    <ReviewStars rating={review.rating} />
 
-                  <blockquote className="mt-5 flex-1 text-step-0">
-                    {review.quote}
-                  </blockquote>
+                    <blockquote className="mt-5 flex-1 text-step-0 break-words">
+                      {review.comment}
+                    </blockquote>
 
-                  <figcaption className="mt-6 border-t border-line pt-5">
-                    <span className="block text-step--1 font-semibold">
-                      {review.name}
-                    </span>
-                    <span className="mt-1 block text-step--1 text-muted">
-                      {review.service}
-                    </span>
-                  </figcaption>
-                </figure>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+                    <figcaption className="mt-6 border-t border-line pt-5">
+                      <span className="block text-step--1 font-semibold break-words">
+                        {review.clientName}
+                      </span>
+                      <span className="mt-1 block text-step--1 text-muted">
+                        {review.serviceLabel}
+                      </span>
+                    </figcaption>
+                  </figure>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-12 min-w-0">
+          <ReviewForm />
+        </div>
       </div>
     </section>
   );
