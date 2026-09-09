@@ -6,8 +6,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { searchServices } from "@/lib/service-search";
 
-/* The instant service search, used twice: on the dark home hero and at
-   the top of the light /services index. Everything it searches comes from
+/* The instant service search, used three times: on the dark home hero,
+   at the top of the light /services index, and in the header dropdown. Everything it searches comes from
    src/lib/services.ts through src/lib/service-search.ts — this file only
    renders and handles the keyboard.
 
@@ -118,15 +118,24 @@ export function ServiceSearch({
   variant = "light",
   className = "",
   placeholder = "ابحث عن الخدمة التي تحتاجها...",
+  autoFocus = false,
+  onNavigate,
 }: {
   variant?: Variant;
   className?: string;
   placeholder?: string;
+  /** Focus the field as soon as this turns true — how the header
+      dropdown hands the caret over when it opens. */
+  autoFocus?: boolean;
+  /** Fired when a result takes the visitor somewhere, so a host that
+      wraps this (the header dropdown) can close itself. */
+  onNavigate?: () => void;
 }) {
   const styles = STYLES[variant];
   const router = useRouter();
   const listId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [query, setQuery] = useState("");
   /* What the results are actually computed from: `query` one beat later,
@@ -164,15 +173,26 @@ export function ServiceSearch({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
 
+  useEffect(() => {
+    if (autoFocus) inputRef.current?.focus();
+  }, [autoFocus]);
+
   const showPanel = open && debounced.trim().length > 0;
   const activeId =
     showPanel && results.length > 0 ? `${listId}-option-${active}` : undefined;
+
+  /* Every link in the panel goes through this, so a host is told about a
+     navigation whichever row or fallback the visitor picked. */
+  const dismiss = () => {
+    setOpen(false);
+    onNavigate?.();
+  };
 
   const go = (index: number, toRequest: boolean) => {
     const result = results[index];
     if (!result) return;
 
-    setOpen(false);
+    dismiss();
     router.push(toRequest ? result.requestHref : result.href);
   };
 
@@ -234,6 +254,7 @@ export function ServiceSearch({
         />
 
         <input
+          ref={inputRef}
           type="text"
           role="combobox"
           value={query}
@@ -307,7 +328,7 @@ export function ServiceSearch({
                     <Link
                       href={result.href}
                       tabIndex={-1}
-                      onClick={() => setOpen(false)}
+                      onClick={dismiss}
                       className="min-w-0 flex-1 py-3 after:absolute after:inset-0 after:content-['']"
                     >
                       <span className="block truncate text-step-0 font-medium">
@@ -327,7 +348,7 @@ export function ServiceSearch({
                     <Link
                       href={result.requestHref}
                       tabIndex={-1}
-                      onClick={() => setOpen(false)}
+                      onClick={dismiss}
                       aria-label={`اطلب ${result.label}`}
                       className={`relative z-10 inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-step--1 font-medium transition-colors duration-fast ease-out ${styles.action}`}
                     >
@@ -355,14 +376,14 @@ export function ServiceSearch({
               <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-step--1 font-medium">
                 <Link
                   href="/services"
-                  onClick={() => setOpen(false)}
+                  onClick={dismiss}
                   className={`transition-colors duration-fast ease-out ${styles.emptyLink}`}
                 >
                   تصفّح كل خدماتنا
                 </Link>
                 <Link
                   href="/request"
-                  onClick={() => setOpen(false)}
+                  onClick={dismiss}
                   className={`transition-colors duration-fast ease-out ${styles.emptyLink}`}
                 >
                   اطلب خدمة مخصصة

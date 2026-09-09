@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { HeaderSearch } from "@/components/header-search";
 import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
 
 const SCROLL_THRESHOLD = 80;
@@ -88,7 +89,10 @@ export function SiteHeader() {
             : "border-transparent bg-transparent text-ink-invert",
         ].join(" ")}
       >
-        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-8 px-6 lg:h-24 lg:px-10">
+        {/* relative: the search dropdown anchors to this container, so it
+            spans the bar on a phone and stays under the header's end edge on
+            a wide screen. */}
+        <div className="relative mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-4 px-6 sm:gap-8 lg:h-24 lg:px-10">
           <Link
             href="/"
             className="text-step-2 font-semibold tracking-tight transition-colors duration-fast ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
@@ -124,13 +128,16 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-4">
             <Link
               href={CTA.href}
               className="hidden rounded-full bg-accent px-7 py-3 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent lg:inline-block"
             >
               {CTA.label}
             </Link>
+
+            {/* Always in the top bar — never folded into the drawer. */}
+            <HeaderSearch />
 
             <button
               ref={toggleRef}
