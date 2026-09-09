@@ -9,9 +9,16 @@ const WHATSAPP_NUMBER = "9665XXXXXXXX";
 /** Prefilled on wa.me, so the first message already has context. */
 const WHATSAPP_MESSAGE = "السلام عليكم، لدي استفسار بخصوص خدمات الفهدار.";
 
+/** A wa.me link on the one number, with whatever opener suits the place
+    it is offered from — the request form asks for a video, the floating
+    button asks a general question. */
+export function whatsappHref(message: string = WHATSAPP_MESSAGE) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 export const CONTACT = {
   whatsapp: {
-    href: `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`,
+    href: whatsappHref(),
     display: "+966 5X XXX XXXX",
   },
   phone: {

@@ -1,3 +1,4 @@
+import { safeStem } from "@/lib/file-name";
 import type { ImageSize } from "@/lib/image-size";
 import { WORK_ITEMS } from "@/lib/work";
 
@@ -52,21 +53,6 @@ const EXTENSIONS: Record<string, string> = {
   "image/gif": "gif",
   "image/avif": "avif",
 };
-
-/** A web-safe stem: the client's filename with everything but ASCII
-    letters, digits, dot, dash and underscore dropped. An Arabic filename
-    reduces to nothing, hence the fallback. */
-function safeStem(fileName: string) {
-  const base = fileName.split(/[\\/]/).pop() ?? "";
-  const stem = base.replace(/\.[^.]+$/, "");
-  const cleaned = stem
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
-
-  return cleaned || "image";
-}
 
 /** The blob pathname for an upload. `put()` adds the random suffix that
     keeps two photos of the same name apart. */

@@ -1,18 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { upload } from "@vercel/blob/client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 
 import { Reveal } from "@/components/reveal";
-import {
-  CITIES,
-  MAX_FILES,
-  MAX_FILE_BYTES,
-  MAX_FILE_MB,
-} from "@/lib/request-options";
+import { whatsappHref } from "@/lib/contact";
+import { extensionFor, safeStem } from "@/lib/file-name";
+import { MAX_IMAGE_MB, imageFileError } from "@/lib/image-limits";
+import { CITIES, MAX_REQUEST_IMAGES } from "@/lib/request-options";
 import { scrollIntoViewSafely } from "@/lib/scroll";
 import { categoryFromSlug } from "@/lib/service-category";
 import { SERVICES } from "@/lib/services";
@@ -34,6 +33,15 @@ const CATEGORY_OPTIONS = SERVICES.flatMap((service) => {
 
 const NETWORK_ERROR =
   "حدث خطأ أثناء إرسال الطلب، برجاء المحاولة مرة أخرى أو التواصل عبر واتساب.";
+
+const UPLOAD_ERROR =
+  "تعذّر رفع الصور، برجاء المحاولة مرة أخرى. بياناتك محفوظة في النموذج.";
+
+/* Offered next to the photo picker: a clip is too heavy to upload here,
+   and WhatsApp is where the conversation continues anyway. */
+const VIDEO_WHATSAPP_HREF = whatsappHref(
+  "السلام عليكم، لدي فيديو لعطل بخصوص طلب خدمة.",
+);
 
 /* --- Shared classes ---------------------------------------------- */
 
@@ -179,9 +187,27 @@ function Field({
 type Attachment = {
   id: string;
   file: File;
-  /** Object URL for images; null for video (shown as a chip). */
-  previewUrl: string | null;
+  /** Object URL for the thumbnail. Images only, so there is always one. */
+  previewUrl: string;
 };
+
+/** Sends one photo straight to the Blob store and returns its public URL.
+
+    The bytes go browser → store, not through our own function: a
+    serverless request body is capped at 4.5 MB on Vercel, under the 8 MB
+    a photo here may weigh. /api/requests/upload only issues the one-shot
+    token, and sets the type and size the store will accept. */
+async function uploadImage(file: File) {
+  const pathname = `requests/${Date.now()}-${safeStem(file.name)}.${extensionFor(file.type)}`;
+
+  const blob = await upload(pathname, file, {
+    access: "public",
+    handleUploadUrl: "/api/requests/upload",
+    contentType: file.type,
+  });
+
+  return blob.url;
+}
 
 /* --- The form ------------------------------------------------------ */
 
@@ -195,6 +221,9 @@ export function RequestForm() {
 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [fileError, setFileError] = useState("");
+  /* Distinguishes the two halves of a submit, which the button announces:
+     the photos are still going up, or the request itself is in flight. */
+  const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [reference, setReference] = useState<string | null>(null);
 
@@ -265,7 +294,7 @@ export function RequestForm() {
 
     const accepted: Attachment[] = [];
     const taken = new Set(attachments.map((item) => item.id));
-    let room = MAX_FILES - attachments.length;
+    let room = MAX_REQUEST_IMAGES - attachments.length;
     let message = "";
 
     for (const file of picked) {
@@ -273,21 +302,19 @@ export function RequestForm() {
       if (taken.has(id)) continue;
 
       if (room === 0) {
-        message = `يمكنك إرفاق ${MAX_FILES} ملفات كحد أقصى.`;
+        message = `يمكنك إرفاق ${MAX_REQUEST_IMAGES} صور كحد أقصى.`;
         break;
       }
-      if (file.size > MAX_FILE_BYTES) {
-        message = `الملف «${file.name}» أكبر من ${MAX_FILE_MB} ميجابايت.`;
+
+      /* The same check the upload route runs: type, size and empty file.
+         Catching it here saves a doomed round trip. */
+      const problem = imageFileError(file);
+      if (problem) {
+        message = `الملف «${file.name}»: ${problem}`;
         continue;
       }
 
-      accepted.push({
-        id,
-        file,
-        previewUrl: file.type.startsWith("image/")
-          ? URL.createObjectURL(file)
-          : null,
-      });
+      accepted.push({ id, file, previewUrl: URL.createObjectURL(file) });
       taken.add(id);
       room -= 1;
     }
@@ -300,14 +327,14 @@ export function RequestForm() {
 
   const removeFile = (id: string) => {
     const target = attachments.find((item) => item.id === id);
-    if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+    if (target) URL.revokeObjectURL(target.previewUrl);
     setAttachments((current) => current.filter((item) => item.id !== id));
     setFileError("");
   };
 
   const clearAttachments = () => {
     for (const item of attachments) {
-      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      URL.revokeObjectURL(item.previewUrl);
     }
     setAttachments([]);
     setFileError("");
@@ -316,14 +343,32 @@ export function RequestForm() {
   const onSubmit = async (values: ServiceRequestValues) => {
     setSubmitError("");
 
-    /* Attachments are deliberately not sent yet — media upload lands in the
-       next phase, and the server stores an empty mediaUrls until then. */
+    /* The photos go up first, one at a time: the request row is only worth
+       creating once every URL it should carry exists. A failure here leaves
+       the form exactly as it was, so the visitor can just submit again. */
+    const mediaUrls: string[] = [];
+    if (attachments.length > 0) {
+      setUploading(true);
+      try {
+        for (const item of attachments) {
+          mediaUrls.push(await uploadImage(item.file));
+        }
+      } catch {
+        /* Whatever the store or the SDK said, it said it in English. The
+           visitor gets the one Arabic line and their filled-in form. */
+        setSubmitError(UPLOAD_ERROR);
+        return;
+      } finally {
+        setUploading(false);
+      }
+    }
+
     let response: Response;
     try {
       response = await fetch("/api/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, mediaUrls }),
       });
     } catch {
       setSubmitError(NETWORK_ERROR);
@@ -496,12 +541,12 @@ export function RequestForm() {
 
           <div>
             <span className="block text-step--1 font-medium">
-              صور أو فيديو للموقع/العطل
+              صور للموقع أو العطل
             </span>
             <p id="attachments-hint" className="mt-1.5 text-step--1 text-muted">
-              يمكنك إرفاق صور أو فيديو للعطل أو المكان لمساعدتنا على فهم طلبك
-              (اختياري). حتى {MAX_FILES} ملفات، بحد أقصى {MAX_FILE_MB}{" "}
-              ميجابايت لكل ملف.
+              أرفق صوراً للعطل أو المكان لمساعدتنا على فهم طلبك (اختياري). حتى{" "}
+              {MAX_REQUEST_IMAGES} صور، بحد أقصى {MAX_IMAGE_MB} ميجابايت
+              للصورة.
             </p>
 
             <div className="mt-3">
@@ -509,7 +554,7 @@ export function RequestForm() {
                 id="attachments"
                 type="file"
                 multiple
-                accept="image/*,video/*"
+                accept="image/*"
                 aria-describedby="attachments-hint attachments-error"
                 onChange={addFiles}
                 className="peer sr-only"
@@ -519,32 +564,38 @@ export function RequestForm() {
                 className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-bg px-4 py-6 text-center text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
               >
                 <PlusIcon />
-                إضافة صور أو فيديو
+                إضافة صور
               </label>
             </div>
+
+            {/* Video is not uploaded here; it goes where the conversation
+                continues anyway. */}
+            <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-step--1 text-muted">
+              <VideoIcon />
+              لديك فيديو للعطل؟
+              <a
+                href={VIDEO_WHATSAPP_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-accent underline-offset-4 transition-colors duration-fast ease-out hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                أرسله لنا عبر واتساب
+              </a>
+            </p>
 
             {attachments.length > 0 && (
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {attachments.map((item) => (
                   <li key={item.id} className="relative min-w-0">
-                    {item.previewUrl ? (
-                      <span className="block aspect-square overflow-hidden rounded-lg border border-line">
-                        {/* Local object URL, so next/image adds nothing here. */}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.previewUrl}
-                          alt={`معاينة ${item.file.name}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </span>
-                    ) : (
-                      <span className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-line bg-bg p-3 text-center">
-                        <VideoIcon />
-                        <span className="line-clamp-2 text-step--1 break-all text-muted">
-                          {item.file.name}
-                        </span>
-                      </span>
-                    )}
+                    <span className="block aspect-square overflow-hidden rounded-lg border border-line">
+                      {/* Local object URL, so next/image adds nothing here. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.previewUrl}
+                        alt={`معاينة ${item.file.name}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </span>
 
                     <button
                       type="button"
@@ -694,7 +745,11 @@ export function RequestForm() {
             disabled={isSubmitting}
             className={`${PRIMARY_CTA} w-full sm:w-auto`}
           >
-            {isSubmitting ? "جارٍ الإرسال..." : "إرسال الطلب"}
+            {uploading
+              ? "جارٍ رفع الصور وإرسال الطلب..."
+              : isSubmitting
+                ? "جارٍ الإرسال..."
+                : "إرسال الطلب"}
           </button>
           <p className="mt-4 text-step--1 text-muted">
             الحقول المعلَّمة بـ

@@ -1,6 +1,8 @@
 import { z } from "zod";
 
+import { isBlobUrl } from "@/lib/blob-url";
 import { SAUDI_MOBILE_ERROR, isSaudiMobile } from "@/lib/phone";
+import { MAX_REQUEST_IMAGES } from "@/lib/request-options";
 import { SERVICE_CATEGORIES } from "@/lib/service-category";
 
 /* --- The preferred day -------------------------------------------
@@ -80,6 +82,14 @@ export const serviceRequestSchema = z.object({
     ),
   isUrgent: z.boolean().default(false),
   notes: z.string().trim().optional(),
+  /** Photos the visitor attached, already uploaded: the form posts the
+      Blob URLs the upload route handed back, never the files. Restricted
+      to that store on purpose — these end up rendered in the dashboard,
+      so an arbitrary URL has no business being stored here. */
+  mediaUrls: z
+    .array(z.string().refine(isBlobUrl, "رابط المرفق غير صالح."))
+    .max(MAX_REQUEST_IMAGES, `يمكنك إرفاق ${MAX_REQUEST_IMAGES} صور كحد أقصى.`)
+    .default([]),
 });
 
 /** What a caller sends: `isUrgent` may be omitted. This is the form's shape. */

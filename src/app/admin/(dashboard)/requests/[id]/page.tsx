@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -160,16 +161,26 @@ export default async function AdminRequestDetailPage({
           {request.mediaUrls.length === 0 ? (
             <p className="text-step--1 text-muted">لا توجد مرفقات.</p>
           ) : (
-            <ul className="flex flex-col gap-2">
-              {request.mediaUrls.map((url) => (
+            /* Photos the client attached to the request. Each square opens
+               the full image in a new tab — enough for a quick look before
+               calling them back. */
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {request.mediaUrls.map((url, index) => (
                 <li key={url} className="min-w-0">
                   <a
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block truncate text-step--1 underline-offset-4 hover:text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    aria-label={`فتح المرفق ${index + 1} بالحجم الكامل`}
+                    className="group relative block aspect-square overflow-hidden rounded-lg border border-line bg-bg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
-                    {url}
+                    <Image
+                      src={url}
+                      alt={`مرفق ${index + 1}`}
+                      fill
+                      sizes="(min-width: 640px) 12rem, 45vw"
+                      className="object-cover transition-transform duration-fast ease-out group-hover:scale-[1.03]"
+                    />
                   </a>
                 </li>
               ))}

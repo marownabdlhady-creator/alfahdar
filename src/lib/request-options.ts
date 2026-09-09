@@ -15,8 +15,11 @@ export const CITIES = [
   "أخرى",
 ] as const;
 
-/* Attachment limits. Enforced in the UI now; the same numbers apply
-   server-side once uploads are wired. */
-export const MAX_FILES = 5;
-export const MAX_FILE_MB = 10;
-export const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
+/* How many photos a request may carry. The form counts them as they are
+   picked and the schema counts the URLs that come back, so a bypassed
+   client cannot store more. The per-file type and size rules live in
+   src/lib/image-limits.ts, which the upload route enforces again.
+
+   Video is not accepted here at all: a clip is far heavier than a photo
+   and the form points those at WhatsApp instead. */
+export const MAX_REQUEST_IMAGES = 5;

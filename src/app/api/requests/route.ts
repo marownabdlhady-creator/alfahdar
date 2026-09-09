@@ -54,9 +54,10 @@ export async function POST(request: Request) {
         : null,
       isUrgent: values.isUrgent,
       notes: values.notes || null,
-      // TODO(next phase): wire the Vercel Blob upload. The form already
-      // collects files; until they are uploaded this stays empty.
-      mediaUrls: [],
+      /* Already in the Blob store: the form uploads each photo through
+         /api/requests/upload first and posts the URLs it got back. The
+         schema has checked they belong to that store. */
+      mediaUrls: values.mediaUrls,
     });
 
     return NextResponse.json(

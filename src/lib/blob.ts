@@ -1,7 +1,11 @@
 import { del, put } from "@vercel/blob";
 
+import { isBlobUrl } from "@/lib/blob-url";
 import { imageSize } from "@/lib/image-size";
 import { workImagePathname } from "@/lib/work-image";
+
+/* Re-exported so server callers keep one import for everything Blob. */
+export { isBlobUrl };
 
 /* Server-only: importing this module pulls in the Blob SDK, which reads
    BLOB_READ_WRITE_TOKEN from the environment. The token never reaches the
@@ -26,12 +30,6 @@ export async function uploadWorkImage(file: File) {
   );
 
   return blob.url;
-}
-
-/** True for a URL that lives in a Vercel Blob store — as opposed to a
-    /public path, which is a file in the repository. */
-export function isBlobUrl(url: string) {
-  return /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//.test(url);
 }
 
 /** Best effort: a blob that outlives its row is litter, but it must never
