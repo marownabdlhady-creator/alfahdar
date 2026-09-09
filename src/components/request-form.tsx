@@ -18,6 +18,7 @@ import { categoryFromSlug } from "@/lib/service-category";
 import { SERVICES } from "@/lib/services";
 import {
   serviceRequestSchema,
+  todayInRiyadh,
   type ServiceRequestErrorResponse,
   type ServiceRequestInput,
   type ServiceRequestSuccessResponse,
@@ -39,6 +40,18 @@ const NETWORK_ERROR =
 /* text-step-0 never drops below 16px, so iOS won't zoom on focus. */
 const FIELD =
   "block w-full min-w-0 max-w-full rounded-lg border border-line bg-surface px-3.5 py-3 text-step-0 text-ink transition-colors duration-fast ease-out placeholder:text-muted/70 focus:border-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent aria-[invalid=true]:border-danger sm:px-4";
+
+/* The native date control, tidied: the browser draws the calendar glyph
+   itself, so it is only muted to sit with the hairline fields and given a
+   pointer so it reads as the button it is. */
+const DATE_FIELD = [
+  "[&::-webkit-calendar-picker-indicator]:cursor-pointer",
+  "[&::-webkit-calendar-picker-indicator]:opacity-45",
+  "[&::-webkit-calendar-picker-indicator]:transition-opacity",
+  "[&::-webkit-calendar-picker-indicator]:duration-fast",
+  "hover:[&::-webkit-calendar-picker-indicator]:opacity-100",
+  "focus:[&::-webkit-calendar-picker-indicator]:opacity-100",
+].join(" ");
 
 const PRIMARY_CTA =
   "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-step--1 font-medium text-ink-invert transition-colors duration-fast ease-out hover:bg-accent hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60 sm:px-8";
@@ -633,15 +646,19 @@ export function RequestForm() {
           <Field
             id="preferredDate"
             label="الموعد المناسب"
-            hint="اختياري — الوقت الذي يناسبك للزيارة."
+            hint="اختياري — اليوم المناسب للزيارة (سيتم تأكيد الوقت عند التواصل معك)."
             error={errors.preferredDate?.message}
           >
+            {/* A day, not a datetime: no hours or minutes to pick, and no
+                past days to pick either. It inherits the page's RTL like
+                every other field, which puts the picker button on the
+                same side as the rest of the form's controls. */}
             <input
               id="preferredDate"
-              type="datetime-local"
-              dir="ltr"
+              type="date"
+              min={todayInRiyadh()}
               aria-describedby="preferredDate-hint preferredDate-error"
-              className={`${FIELD} text-right`}
+              className={`${FIELD} ${DATE_FIELD}`}
               {...register("preferredDate")}
             />
           </Field>

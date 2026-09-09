@@ -46,6 +46,9 @@ export async function POST(request: Request) {
       city: values.city,
       district: values.district,
       address: values.address || null,
+      /* YYYY-MM-DD parses as midnight UTC, which is 03:00 the same day in
+         Riyadh — so the dashboard formats back the day that was picked.
+         Blank stays null: the field is optional. */
       preferredDate: values.preferredDate
         ? new Date(values.preferredDate)
         : null,
