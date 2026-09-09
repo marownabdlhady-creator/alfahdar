@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Reveal } from "@/components/reveal";
+import { ServiceSearch } from "@/components/service-search";
 import { SERVICES } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -77,6 +78,13 @@ export default function ServicesPage() {
               البناء، التشطيبات، الصيانة، الخدمات الفنية والنظافة — بجودة
               واحترافية وفريق مختص لكل تخصص.
             </p>
+          </Reveal>
+
+          {/* z-20 on the Reveal itself: .reveal carries a transform, which
+              makes it a stacking context — a z-index on the search inside
+              it could not lift the results panel over the blocks below. */}
+          <Reveal delay={90} className="relative z-20 mt-9 max-w-2xl">
+            <ServiceSearch variant="light" />
           </Reveal>
 
           <div className="mt-section space-y-section">

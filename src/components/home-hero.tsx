@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type CSSProperties, useEffect, useState } from "react";
 
+import { ServiceSearch } from "@/components/service-search";
 import { BRAND } from "@/lib/nav";
 
 /* Files in /public. Order matters: the first one paints the hero. */
@@ -50,7 +51,12 @@ export function HomeHero() {
   }, []);
 
   return (
-    <section className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-bg-dark text-ink-invert">
+    /* No overflow-hidden: the search panel opens low in the hero and has
+       to hang over the section below it. Nothing else here overflows —
+       the backdrop layers are inset-0 and the section's height follows its
+       content — and z-10 keeps the whole hero, panel included, above the
+       sections that come after it. */
+    <section className="relative isolate z-10 flex min-h-[100svh] flex-col justify-end bg-bg-dark text-ink-invert">
       {/* --- Cross-fading backdrop ------------------------------------ */}
       {SLIDES.map((src, i) => {
         const active = i === index;
@@ -125,9 +131,18 @@ export function HomeHero() {
           مقاولات، تشطيبات، صيانة وخدمات فنية باحترافية.
         </p>
 
+        {/* z-20: the results panel has to paint over the rest of the hero
+            and over the section below it, both of which sit at z-0 here. */}
         <div
-          className="hero-rise mt-11 flex flex-wrap items-center gap-4"
+          className="hero-rise relative z-20 mt-9 max-w-xl"
           style={{ "--hero-delay": "0.9s" } as CSSProperties}
+        >
+          <ServiceSearch variant="dark" />
+        </div>
+
+        <div
+          className="hero-rise mt-8 flex flex-wrap items-center gap-4"
+          style={{ "--hero-delay": "1.05s" } as CSSProperties}
         >
           <Link
             href="/request"
