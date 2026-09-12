@@ -110,11 +110,16 @@ export function HomeHero() {
           </span>
         </div>
 
+        {/* The Latin wordmark, in the same Inter the footer and the 404
+            use for Latin. No dir on the h1: the heading stays in the RTL
+            flow so it keeps aligning to the start edge like the Arabic
+            lines under it, and bdi isolates the run so the surrounding
+            RTL can't reorder it. Caps want air, not tracking-tight. */}
         <h1
-          className="hero-rise text-step-6 font-bold tracking-tight"
+          className="hero-rise font-inter text-step-6 font-bold tracking-[0.01em]"
           style={{ "--hero-delay": "0.3s" } as CSSProperties}
         >
-          {BRAND.name}
+          <bdi>ALFAHDAR</bdi>
         </h1>
 
         <p

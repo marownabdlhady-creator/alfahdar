@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { LogoutButton } from "@/components/admin/logout-button";
+import { BrandLogo } from "@/components/brand-logo";
 import { ADMIN_NAV, adminSectionTitle, isActiveAdminLink } from "@/lib/admin-nav";
 import { BRAND } from "@/lib/nav";
 
@@ -59,9 +60,11 @@ function SidebarContent({
         <Link
           href="/admin"
           onClick={onNavigate}
-          className="text-step-1 font-semibold tracking-tight transition-colors duration-fast ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          aria-label={`${BRAND.name} — لوحة التحكم`}
+          className="inline-block transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
-          {BRAND.name}
+          {/* bg-surface sidebar — the ink silhouette. */}
+          <BrandLogo backdrop="light" className="h-8" />
         </Link>
         <p className="mt-1 text-step--1 text-muted">لوحة التحكم</p>
       </div>

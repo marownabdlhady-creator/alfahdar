@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { HeaderSearch } from "@/components/header-search";
 import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
 
@@ -93,11 +94,20 @@ export function SiteHeader() {
             spans the bar on a phone and stays under the header's end edge on
             a wide screen. */}
         <div className="relative mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-4 px-6 sm:gap-8 lg:h-24 lg:px-10">
+          {/* The logo follows the header's two states: its own metallic
+              artwork over the dark hero, an ink silhouette once the bar
+              turns solid. The filter transitions with the bar's colours,
+              so the swap isn't a jump. */}
           <Link
             href="/"
-            className="text-step-2 font-semibold tracking-tight transition-colors duration-fast ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
+            aria-label={`${BRAND.name} — الصفحة الرئيسية`}
+            className="shrink-0 transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
           >
-            {BRAND.name}
+            <BrandLogo
+              eager
+              backdrop={solid ? "light" : "dark"}
+              className="h-9 transition-[filter] duration-med ease-out lg:h-11"
+            />
           </Link>
 
           <nav aria-label="التنقل الرئيسي" className="hidden lg:block">
@@ -171,9 +181,8 @@ export function SiteHeader() {
       >
         <div className="flex h-full flex-col">
           <div className="mx-auto flex h-20 w-full max-w-7xl shrink-0 items-center justify-between px-6">
-            <span className="text-step-2 font-semibold tracking-tight">
-              {BRAND.name}
-            </span>
+            {/* The drawer is bg-bg-dark, so the artwork shows as drawn. */}
+            <BrandLogo backdrop="dark" className="h-9" />
             <button
               ref={closeRef}
               type="button"

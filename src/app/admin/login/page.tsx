@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { AdminLoginForm } from "@/components/admin/login-form";
+import { BrandLogo } from "@/components/brand-logo";
 import { BRAND } from "@/lib/nav";
 
 export const metadata: Metadata = {
@@ -15,11 +16,14 @@ export default function AdminLoginPage() {
     <main className="flex flex-1 items-center justify-center px-4 py-16 sm:px-6">
       <div className="w-full max-w-md">
         <div className="text-center">
+          {/* Light page, so the ink silhouette. inline-block keeps the
+              logo inside the centred column instead of filling it. */}
           <Link
             href="/"
-            className="text-step-2 font-semibold tracking-tight transition-colors duration-fast ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
+            aria-label={`${BRAND.name} — الصفحة الرئيسية`}
+            className="inline-block transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
           >
-            {BRAND.name}
+            <BrandLogo eager backdrop="light" className="h-11" />
           </Link>
         </div>
 

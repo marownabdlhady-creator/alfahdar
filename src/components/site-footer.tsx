@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { CONTACT } from "@/lib/contact";
 import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
 import { SERVICES } from "@/lib/services";
@@ -50,11 +51,13 @@ export function SiteFooter() {
       <div className="mx-auto w-full max-w-7xl px-6 py-section-sm lg:px-10">
         <div className="grid gap-14 md:grid-cols-2 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-4">
+            {/* bg-bg-dark here, so the metallic artwork needs no treatment. */}
             <Link
               href="/"
-              className="text-step-3 font-semibold tracking-tight transition-colors duration-fast ease-out hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
+              aria-label={`${BRAND.name} — الصفحة الرئيسية`}
+              className="inline-block transition-opacity duration-fast ease-out hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-accent"
             >
-              {BRAND.name}
+              <BrandLogo backdrop="dark" className="h-12 sm:h-14" />
             </Link>
             <p className="mt-5 max-w-xs text-step-0 leading-relaxed text-ink-invert/70">
               {BRAND.tagline}
