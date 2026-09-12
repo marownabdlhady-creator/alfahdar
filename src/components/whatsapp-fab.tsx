@@ -4,8 +4,7 @@ import { CONTACT } from "@/lib/contact";
     left), above page content but below the mobile menu (z-60) and the
     gallery lightbox (z-70), so neither of those has to work around it.
 
-    The number and the prefilled Arabic message live in src/lib/contact.ts.
-    TODO: replace with real WhatsApp number. */
+    The number and the prefilled Arabic message live in src/lib/contact.ts. */
 export function WhatsappFab() {
   return (
     /* The wrapper carries the entrance so the anchor keeps its transform

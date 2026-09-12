@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CONTACT } from "@/lib/contact";
 import { BRAND, CTA, NAV_LINKS } from "@/lib/nav";
 import { SERVICES } from "@/lib/services";
 
@@ -10,10 +11,26 @@ const SERVICE_LINKS = SERVICES.map((service) => ({
   href: service.href,
 }));
 
+/* One number answers both the call row and the WhatsApp row. */
 const CONTACT_ITEMS = [
-  { label: "هاتف", value: "الهاتف قريباً", href: "#" },
-  { label: "البريد", value: "البريد الإلكتروني قريباً", href: "#" },
-  { label: "واتساب", value: "تواصل عبر واتساب", href: "#" },
+  {
+    label: "هاتف",
+    value: CONTACT.phone.display,
+    href: CONTACT.phone.href,
+    external: false,
+  },
+  {
+    label: "البريد",
+    value: CONTACT.email.display,
+    href: CONTACT.email.href,
+    external: false,
+  },
+  {
+    label: "واتساب",
+    value: CONTACT.whatsapp.display,
+    href: CONTACT.whatsapp.href,
+    external: true,
+  },
 ];
 
 const linkClass =
@@ -88,8 +105,17 @@ export function SiteFooter() {
                   <span className="block text-step--1 text-ink-invert/45">
                     {item.label}
                   </span>
-                  <a href={item.href} className={`mt-1 ${linkClass}`}>
-                    {item.value}
+                  <a
+                    href={item.href}
+                    aria-label={`${item.label}: ${item.value}`}
+                    {...(item.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    className={`mt-1 ${linkClass}`}
+                  >
+                    {/* bdi keeps the number and the address reading
+                        left-to-right inside the RTL column. */}
+                    <bdi dir="ltr">{item.value}</bdi>
                   </a>
                 </li>
               ))}

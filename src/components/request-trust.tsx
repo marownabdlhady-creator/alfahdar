@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
 
+import { whatsappHref } from "@/lib/contact";
+
+/* Offered beside the request form, so the opener says which page it
+   came from. */
+const TRUST_WHATSAPP_HREF = whatsappHref(
+  "السلام عليكم، أرغب في طلب خدمة من الفهدار.",
+);
+
 function Stroke({ children }: { children: ReactNode }) {
   return (
     <svg
@@ -78,9 +86,10 @@ export function RequestTrust() {
         ))}
       </ul>
 
-      {/* TODO: real WhatsApp number in the contact phase. */}
       <a
-        href="#"
+        href={TRUST_WHATSAPP_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
         className="mt-7 flex items-center justify-center gap-2 rounded-full border border-line px-5 py-3 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
         <Stroke>
