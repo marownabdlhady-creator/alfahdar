@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/nav";
-import { SERVICES, getService } from "@/lib/services";
+import { SERVICES, getService, hasOwnPage } from "@/lib/services";
 import { absoluteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -335,21 +335,52 @@ export default async function ServiceDetailPage({ params }: Params) {
           </Reveal>
 
           <ul className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-            {service.subServices.map((item, index) => (
-              <li key={item.name}>
-                <Reveal delay={index * 60} className="h-full">
-                  <div className="h-full rounded-xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(13,13,13,0.03)]">
-                    <TickIcon />
-                    <h3 className="mt-4 text-step-1 font-semibold tracking-tight">
-                      {item.name}
-                    </h3>
-                    <p className="mt-2 text-step--1 text-muted">
-                      {item.description}
-                    </p>
-                  </div>
-                </Reveal>
-              </li>
-            ))}
+            {service.subServices.map((item, index) => {
+              /* A sub-service that carries its own content block gets its
+                 own page; the rest stay plain cards until theirs is
+                 filled in, so nothing here can point at a 404. */
+              const detailHref = hasOwnPage(item)
+                ? `${service.href}/${item.subSlug}`
+                : null;
+
+              const body = (
+                <>
+                  <TickIcon />
+                  <h3 className="mt-4 text-step-1 font-semibold tracking-tight">
+                    {item.name}
+                  </h3>
+                  <p className="mt-2 text-step--1 text-muted">
+                    {item.description}
+                  </p>
+                  {detailHref ? (
+                    <span className="mt-auto inline-flex items-center gap-2 pt-5 text-step--1 font-medium text-ink transition-colors duration-fast ease-out group-hover:text-accent">
+                      التفاصيل
+                      <ArrowIcon />
+                    </span>
+                  ) : null}
+                </>
+              );
+
+              return (
+                <li key={item.name}>
+                  <Reveal delay={index * 60} className="h-full">
+                    {detailHref ? (
+                      <Link
+                        href={detailHref}
+                        aria-label={`تفاصيل خدمة ${item.name}`}
+                        className="group flex h-full flex-col rounded-xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(13,13,13,0.03)] transition-colors duration-fast ease-out hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div className="flex h-full flex-col rounded-xl border border-line bg-surface p-7 shadow-[0_1px_2px_rgba(13,13,13,0.03)]">
+                        {body}
+                      </div>
+                    )}
+                  </Reveal>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>

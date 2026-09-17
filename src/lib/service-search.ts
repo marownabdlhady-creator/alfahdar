@@ -1,6 +1,6 @@
 import { isOneEditApart, normalizeArabic, tokenize } from "@/lib/arabic";
 import { SERVICE_SYNONYMS } from "@/lib/service-synonyms";
-import { SERVICES } from "@/lib/services";
+import { SERVICES, hasOwnPage, subServiceHref } from "@/lib/services";
 
 /* The instant service search.
 
@@ -141,13 +141,14 @@ for (const service of SERVICES) {
       label: sub.name,
       categoryTitle: service.title,
       hint: sub.description,
-      href: service.href,
+      /* Its own page once it has one, the category page until then. */
+      href: subServiceHref(service, sub),
       requestHref,
       isCategory: false,
       name: normalizeArabic(sub.name),
       nameTokens: tokenize(normalizeArabic(sub.name)),
       synonyms: [],
-      keywords: [],
+      keywords: hasOwnPage(sub) ? normalizeAll(sub.keywords) : [],
       description: normalizeArabic(sub.description),
       rank: INDEX.length,
     });

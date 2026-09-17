@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Reveal } from "@/components/reveal";
 import { ServiceSearch } from "@/components/service-search";
-import { SERVICES } from "@/lib/services";
+import { SERVICES, hasOwnPage } from "@/lib/services";
 
 export const metadata: Metadata = {
   title: "خدماتنا | الفهدار",
@@ -27,6 +27,10 @@ const PRIMARY_CTA =
 
 const SECONDARY_CTA =
   "inline-flex items-center rounded-full border border-line px-8 py-3.5 text-step--1 font-medium text-ink transition-colors duration-fast ease-out hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent";
+
+/** One sub-service, as a pill under its category block. */
+const CHIP =
+  "inline-block rounded-full border border-line bg-surface px-4 py-1.5 text-step--1 text-ink";
 
 function ArrowIcon() {
   return (
@@ -144,11 +148,20 @@ export default function ServicesPage() {
                           className="mt-7 flex flex-wrap gap-2"
                         >
                           {service.subServices.map((item) => (
-                            <li
-                              key={item.name}
-                              className="rounded-full border border-line bg-surface px-4 py-1.5 text-step--1 text-ink"
-                            >
-                              {item.name}
+                            <li key={item.name}>
+                              {/* A chip links to the sub-service's own page
+                                  once that page exists, and stays a plain
+                                  chip until then. */}
+                              {hasOwnPage(item) ? (
+                                <Link
+                                  href={`${service.href}/${item.subSlug}`}
+                                  className={`${CHIP} transition-colors duration-fast ease-out hover:border-ink hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent`}
+                                >
+                                  {item.name}
+                                </Link>
+                              ) : (
+                                <span className={CHIP}>{item.name}</span>
+                              )}
                             </li>
                           ))}
                         </ul>

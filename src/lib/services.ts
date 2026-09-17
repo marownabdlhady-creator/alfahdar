@@ -1,7 +1,41 @@
-export type SubService = {
-  name: string;
-  description: string;
+export type SubServiceFaq = {
+  question: string;
+  answer: string;
 };
+
+/** Everything a sub-service needs before it can carry its own page at
+    /services/[slug]/[subSlug]. Fill this block on a sub-service and the
+    page generates itself — route, metadata, JSON-LD and internal links
+    all read from here, so no other file changes. */
+export type SubServicePage = {
+  /** The last path segment. Latin, lowercase, hyphenated. */
+  subSlug: string;
+  /** The keyword-carrying opener under the h1. */
+  longDescription: string;
+  /** "ما نقدمه" — what the service actually covers. */
+  whatWeOffer: string[];
+  /** "لماذا الفهدار" — three or four reasons, one line each. */
+  whyUs: string[];
+  /** Rendered as an accordion and as FAQPage structured data. */
+  faqs: SubServiceFaq[];
+  keywords: string[];
+  seoTitle: string;
+  seoDescription: string;
+};
+
+/* A sub-service either has the whole page block or none of it — the
+   union is what stops a half-filled one from compiling. */
+export type SubService =
+  | { name: string; description: string }
+  | ({ name: string; description: string } & SubServicePage);
+
+/** A sub-service that has its own page. */
+export type DetailedSubService = Extract<SubService, SubServicePage>;
+
+/** Narrows to the sub-services that have their own page. */
+export function hasOwnPage(sub: SubService): sub is DetailedSubService {
+  return "subSlug" in sub;
+}
 
 export type Service = {
   /** Stable slug; also the photo filename in /public/services. */
@@ -267,34 +301,280 @@ export const SERVICES: Service[] = [
         name: "صيانة مكيفات",
         description:
           "تنظيف وفحص وإصلاح المكيفات وتعبئة الفريون لأداء أفضل.",
+        subSlug: "ac-maintenance",
+        longDescription:
+          "خدمة صيانة مكيفات احترافية في جميع أنحاء المملكة، تشمل التنظيف والفحص وإصلاح الأعطال وتعبئة الفريون لضمان تبريد مثالي وكفاءة عالية طوال العام. فريقنا من الفنيين المدرّبين يتعامل مع جميع أنواع المكيفات: سبليت، مركزي، شباك، ودولابي.",
+        whatWeOffer: [
+          "تنظيف شامل للمكيف والفلاتر والوحدة الخارجية",
+          "فحص وتشخيص الأعطال بدقة",
+          "تعبئة وشحن غاز الفريون",
+          "إصلاح تسريبات التبريد",
+          "صيانة دورية وقائية",
+          "فك وتركيب ونقل المكيفات",
+        ],
+        whyUs: [
+          "فنيون متخصصون في جميع أنواع المكيفات",
+          "قطع غيار أصلية بضمان",
+          "استجابة سريعة في نفس اليوم",
+          "أسعار واضحة قبل بدء العمل",
+        ],
+        faqs: [
+          {
+            question: "كم مرة أحتاج صيانة المكيف؟",
+            answer:
+              "يُنصح بصيانة دورية كل 3 إلى 6 أشهر للحفاظ على كفاءة التبريد وإطالة عمر المكيف.",
+          },
+          {
+            question: "هل تقدمون خدمة تعبئة الفريون؟",
+            answer:
+              "نعم، نقوم بفحص مستوى الفريون وتعبئته بالنوع المناسب لجهازك.",
+          },
+          {
+            question: "هل الخدمة متوفرة في نفس اليوم؟",
+            answer:
+              "نوفر خدمة استجابة سريعة في نفس اليوم للحالات الطارئة حسب توفر الفنيين في منطقتك.",
+          },
+        ],
+        keywords: [
+          "صيانة مكيفات",
+          "تنظيف مكيفات",
+          "تعبئة فريون",
+          "إصلاح مكيفات",
+          "صيانة مكيفات السعودية",
+        ],
+        seoTitle: "صيانة مكيفات في السعودية | الفهدار",
+        seoDescription:
+          "صيانة مكيفات في السعودية: تنظيف وفحص وإصلاح الأعطال وتعبئة الفريون لجميع أنواع المكيفات سبليت ومركزي وشباك، بفنيين متخصصين واستجابة في نفس اليوم.",
       },
       {
         name: "صيانة غسالات",
         description:
           "تشخيص وإصلاح أعطال الغسالات بمختلف أنواعها بقطع غيار أصلية.",
+        subSlug: "washing-machine-maintenance",
+        longDescription:
+          "صيانة وإصلاح الغسالات بجميع أنواعها (أوتوماتيك، فوق أوتوماتيك، عادية) على يد فنيين متخصصين، مع تشخيص دقيق للعطل واستخدام قطع غيار أصلية تضمن عمل الغسالة بكفاءة.",
+        whatWeOffer: [
+          "تشخيص أعطال الغسالة بدقة",
+          "إصلاح مشاكل التسريب والتصريف",
+          "استبدال القطع التالفة بقطع أصلية",
+          "إصلاح مشاكل الدوران والعصر",
+          "صيانة لوحة التحكم والبرامج",
+        ],
+        whyUs: [
+          "خبرة في جميع الماركات",
+          "قطع غيار أصلية مضمونة",
+          "تشخيص دقيق قبل الإصلاح",
+          "ضمان على الإصلاح",
+        ],
+        faqs: [
+          {
+            question: "غسالتي لا تصرّف الماء، ما السبب؟",
+            answer:
+              "غالباً بسبب انسداد مضخة التصريف أو الفلتر، ويحتاج فحصاً لتحديد السبب بدقة.",
+          },
+          {
+            question: "هل توفرون قطع غيار أصلية؟",
+            answer:
+              "نعم، نستخدم قطع غيار أصلية مناسبة لماركة وموديل غسالتك.",
+          },
+        ],
+        keywords: [
+          "صيانة غسالات",
+          "إصلاح غسالات",
+          "فني غسالات",
+          "صيانة غسالات السعودية",
+        ],
+        seoTitle: "صيانة غسالات في السعودية | الفهدار",
+        seoDescription:
+          "صيانة وإصلاح غسالات في السعودية لجميع الأنواع والماركات: تشخيص دقيق للعطل، إصلاح التسريب والتصريف والعصر، بقطع غيار أصلية وضمان على الإصلاح.",
       },
       {
         name: "صيانة ثلاجات",
         description: "إصلاح أعطال التبريد والثلاجات واستعادة كفاءتها بسرعة.",
+        subSlug: "refrigerator-maintenance",
+        longDescription:
+          "إصلاح وصيانة الثلاجات والفريزرات بمختلف أنواعها، مع معالجة مشاكل التبريد والتسريب واستعادة كفاءة الجهاز بأسرع وقت للحفاظ على أطعمتك.",
+        whatWeOffer: [
+          "إصلاح أعطال التبريد الضعيف أو المتوقف",
+          "معالجة تسريب الغاز وإعادة الشحن",
+          "إصلاح الثرموستات ومنظم الحرارة",
+          "استبدال القطع التالفة",
+          "صيانة الفريزر والثلاجات المكتبية",
+        ],
+        whyUs: [
+          "استجابة سريعة للحفاظ على أطعمتك",
+          "فنيون متخصصون في التبريد",
+          "قطع غيار أصلية",
+          "ضمان على الخدمة",
+        ],
+        faqs: [
+          {
+            question: "ثلاجتي لا تبرّد جيداً، ما الحل؟",
+            answer:
+              "قد يكون السبب نقص الغاز أو عطل في الكمبروسر أو الثرموستات، ونحدده بالفحص.",
+          },
+          {
+            question: "كم يستغرق إصلاح الثلاجة؟",
+            answer:
+              "معظم الأعطال تُصلح في نفس الزيارة، وبعضها قد يحتاج توفير قطعة غيار.",
+          },
+        ],
+        keywords: [
+          "صيانة ثلاجات",
+          "إصلاح ثلاجات",
+          "صيانة فريزر",
+          "صيانة ثلاجات السعودية",
+        ],
+        seoTitle: "صيانة ثلاجات وفريزر في السعودية | الفهدار",
+        seoDescription:
+          "صيانة وإصلاح ثلاجات وفريزر في السعودية: معالجة ضعف التبريد وتسريب الغاز وإصلاح الثرموستات، بفنيي تبريد متخصصين وقطع غيار أصلية واستجابة سريعة.",
       },
       {
         name: "صيانة الأجهزة المنزلية",
         description:
           "صيانة شاملة للأجهزة المنزلية على يد فنيين متخصصين.",
+        subSlug: "home-appliances-maintenance",
+        longDescription:
+          "صيانة شاملة لجميع الأجهزة المنزلية على يد فنيين متخصصين، من الأفران والمايكروويف إلى السخانات والمكانس وغيرها، بجودة عالية وأسعار مناسبة.",
+        whatWeOffer: [
+          "صيانة الأفران والبوتاجازات",
+          "إصلاح السخانات الكهربائية والغاز",
+          "صيانة المايكروويف",
+          "إصلاح الأجهزة الصغيرة",
+          "فحص وصيانة عامة",
+        ],
+        whyUs: [
+          "تغطية واسعة لأنواع الأجهزة",
+          "فنيون مدرّبون",
+          "قطع أصلية",
+          "ضمان على الإصلاح",
+        ],
+        faqs: [
+          {
+            question: "هل تصلحون جميع أنواع الأجهزة؟",
+            answer:
+              "نغطي معظم الأجهزة المنزلية الشائعة؛ أخبرنا بنوع جهازك وسنؤكد لك.",
+          },
+        ],
+        keywords: [
+          "صيانة أجهزة منزلية",
+          "إصلاح أجهزة",
+          "صيانة أفران",
+          "صيانة أجهزة منزلية السعودية",
+        ],
+        seoTitle: "صيانة الأجهزة المنزلية في السعودية | الفهدار",
+        seoDescription:
+          "صيانة الأجهزة المنزلية في السعودية: أفران وبوتاجازات وسخانات ومايكروويف والأجهزة الصغيرة، على يد فنيين مدرَّبين بقطع غيار أصلية وضمان على الإصلاح.",
       },
       {
         name: "صيانة دورية",
         description:
           "برامج صيانة دورية تحافظ على أجهزتك وتطيل عمرها الافتراضي.",
+        subSlug: "periodic-maintenance",
+        longDescription:
+          "برامج صيانة دورية وقائية للأجهزة والمعدات المنزلية تحافظ على كفاءتها وتطيل عمرها الافتراضي وتوفّر عليك تكاليف الأعطال المفاجئة.",
+        whatWeOffer: [
+          "فحص دوري شامل للأجهزة",
+          "تنظيف وقائي",
+          "اكتشاف الأعطال مبكراً",
+          "تقارير بحالة الأجهزة",
+          "جدولة زيارات منتظمة",
+        ],
+        whyUs: [
+          "توفير تكاليف الأعطال الكبيرة",
+          "إطالة عمر أجهزتك",
+          "راحة بال دائمة",
+          "خطط مرنة",
+        ],
+        faqs: [
+          {
+            question: "ما فائدة الصيانة الدورية؟",
+            answer:
+              "تكتشف المشاكل مبكراً قبل أن تتفاقم، وتحافظ على كفاءة أجهزتك وتطيل عمرها.",
+          },
+        ],
+        keywords: [
+          "صيانة دورية",
+          "صيانة وقائية",
+          "عقود صيانة",
+          "صيانة دورية السعودية",
+        ],
+        seoTitle: "صيانة دورية وقائية للأجهزة المنزلية | الفهدار",
+        seoDescription:
+          "برامج صيانة دورية وقائية في السعودية: فحص شامل وتنظيف واكتشاف مبكر للأعطال وتقارير بحالة الأجهزة، لإطالة عمرها وتوفير تكاليف الأعطال المفاجئة.",
       },
       {
         name: "إصلاح الأعطال",
         description: "استجابة سريعة لإصلاح الأعطال الطارئة في وقتها.",
+        subSlug: "fault-repair",
+        longDescription:
+          "خدمة إصلاح أعطال طارئة سريعة لجميع الأجهزة والمعدات المنزلية، باستجابة فورية وتشخيص دقيق وإصلاح موثوق في نفس الزيارة قدر الإمكان.",
+        whatWeOffer: [
+          "استجابة سريعة للأعطال الطارئة",
+          "تشخيص فوري ودقيق",
+          "إصلاح في نفس الزيارة قدر الإمكان",
+          "قطع غيار أصلية",
+          "ضمان على الإصلاح",
+        ],
+        whyUs: [
+          "سرعة الاستجابة",
+          "توفّر الفنيين",
+          "شفافية في التسعير",
+          "ضمان على الإصلاح",
+        ],
+        faqs: [
+          {
+            question: "كم تستغرقون للوصول؟",
+            answer:
+              "نسعى للوصول في أسرع وقت حسب موقعك وتوفر الفنيين، وغالباً في نفس اليوم.",
+          },
+        ],
+        keywords: [
+          "إصلاح أعطال",
+          "صيانة طارئة",
+          "فني صيانة",
+          "إصلاح أعطال السعودية",
+        ],
+        seoTitle: "إصلاح الأعطال الطارئة وصيانة سريعة | الفهدار",
+        seoDescription:
+          "إصلاح أعطال طارئة في السعودية باستجابة سريعة: تشخيص فوري ودقيق وإصلاح في نفس الزيارة قدر الإمكان، بقطع غيار أصلية وتسعير واضح وضمان على العمل.",
       },
       {
         name: "عقود صيانة",
         description:
           "عقود صيانة مرنة للمنازل والمنشآت تضمن راحة البال.",
+        subSlug: "maintenance-contracts",
+        longDescription:
+          "عقود صيانة مرنة للمنازل والمنشآت تضمن صيانة منتظمة وأولوية في الخدمة وأسعاراً مميزة، لراحة بال دائمة دون القلق من الأعطال.",
+        whatWeOffer: [
+          "عقود صيانة سنوية أو نصف سنوية",
+          "أولوية في الاستجابة",
+          "أسعار مميزة للمتعاقدين",
+          "صيانة دورية مجدولة",
+          "تقارير منتظمة",
+        ],
+        whyUs: [
+          "أسعار أفضل على المدى الطويل",
+          "أولوية في الخدمة",
+          "تغطية شاملة",
+          "مرونة في الخطط",
+        ],
+        faqs: [
+          {
+            question: "ما الذي يشمله عقد الصيانة؟",
+            answer:
+              "يشمل زيارات صيانة دورية مجدولة وأولوية في الاستجابة وأسعاراً مميزة، ويمكن تخصيصه حسب احتياجك.",
+          },
+        ],
+        keywords: [
+          "عقود صيانة",
+          "صيانة سنوية",
+          "عقد صيانة منزل",
+          "عقود صيانة السعودية",
+        ],
+        seoTitle: "عقود صيانة سنوية للمنازل والمنشآت | الفهدار",
+        seoDescription:
+          "عقود صيانة مرنة في السعودية للمنازل والمنشآت: زيارات صيانة مجدولة وأولوية في الاستجابة وأسعار مميزة للمتعاقدين وتقارير منتظمة براحة بال دائمة.",
       },
     ],
     whyHeading: "لماذا الفهدار للصيانة؟",
@@ -545,4 +825,33 @@ export const SERVICES: Service[] = [
 
 export function getService(slug: string) {
   return SERVICES.find((service) => service.slug === slug);
+}
+
+/** The sub-service's own page, or the category page when it has none —
+    so a listing can link every row without ever pointing at a 404. */
+export function subServiceHref(service: Service, sub: SubService) {
+  return hasOwnPage(sub) ? `${service.href}/${sub.subSlug}` : service.href;
+}
+
+/** Every sub-service that has its own page, with its category. Drives
+    generateStaticParams and the sibling links, so a newly filled
+    sub-service is picked up everywhere at once. */
+export function listSubServicePages() {
+  return SERVICES.flatMap((service) =>
+    service.subServices
+      .filter(hasOwnPage)
+      .map((sub) => ({ service, sub, href: `${service.href}/${sub.subSlug}` })),
+  );
+}
+
+/** The pair behind /services/[slug]/[subSlug], or undefined for a 404. */
+export function getSubService(slug: string, subSlug: string) {
+  const service = getService(slug);
+  if (!service) return undefined;
+
+  const sub = service.subServices
+    .filter(hasOwnPage)
+    .find((item) => item.subSlug === subSlug);
+
+  return sub ? { service, sub } : undefined;
 }
