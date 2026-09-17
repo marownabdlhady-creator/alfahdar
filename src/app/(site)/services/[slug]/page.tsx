@@ -6,7 +6,12 @@ import type { ReactNode } from "react";
 
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/nav";
-import { SERVICES, getService, hasOwnPage } from "@/lib/services";
+import {
+  SERVICES,
+  getService,
+  hasOwnPage,
+  subServiceImage,
+} from "@/lib/services";
 import { absoluteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -165,6 +170,11 @@ export default async function ServiceDetailPage({ params }: Params) {
   if (!service) notFound();
 
   const others = SERVICES.filter((item) => item.slug !== service.slug);
+
+  /* Photos on the sub-service cards only once the whole category has its
+     own — otherwise the fallback would repeat the category photo down
+     the grid. */
+  const withPhotos = service.subServices.every((item) => item.image);
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -345,6 +355,18 @@ export default async function ServiceDetailPage({ params }: Params) {
 
               const body = (
                 <>
+                  {withPhotos ? (
+                    /* Decorative: the heading below names the service. */
+                    <span className="relative -mx-7 -mt-7 mb-7 block aspect-[16/10] overflow-hidden rounded-t-xl border-b border-line">
+                      <Image
+                        src={subServiceImage(service, item)}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 88vw"
+                        className="object-cover transition-transform duration-med ease-out group-hover:scale-[1.03]"
+                      />
+                    </span>
+                  ) : null}
                   <TickIcon />
                   <h3 className="mt-4 text-step-1 font-semibold tracking-tight">
                     {item.name}

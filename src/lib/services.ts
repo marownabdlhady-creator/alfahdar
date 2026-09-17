@@ -23,11 +23,18 @@ export type SubServicePage = {
   seoDescription: string;
 };
 
+type SubServiceBase = {
+  name: string;
+  description: string;
+  /** Its own photo, in /public/services/<category>/<subSlug>.jpg. The
+      category photo stands in wherever this is missing, so a category
+      can gain its images one at a time. */
+  image?: string;
+};
+
 /* A sub-service either has the whole page block or none of it — the
    union is what stops a half-filled one from compiling. */
-export type SubService =
-  | { name: string; description: string }
-  | ({ name: string; description: string } & SubServicePage);
+export type SubService = SubServiceBase | (SubServiceBase & SubServicePage);
 
 /** A sub-service that has its own page. */
 export type DetailedSubService = Extract<SubService, SubServicePage>;
@@ -302,6 +309,7 @@ export const SERVICES: Service[] = [
         description:
           "تنظيف وفحص وإصلاح المكيفات وتعبئة الفريون لأداء أفضل.",
         subSlug: "ac-maintenance",
+        image: "/services/maintenance/ac-maintenance.jpg",
         longDescription:
           "خدمة صيانة مكيفات احترافية في جميع أنحاء المملكة، تشمل التنظيف والفحص وإصلاح الأعطال وتعبئة الفريون لضمان تبريد مثالي وكفاءة عالية طوال العام. فريقنا من الفنيين المدرّبين يتعامل مع جميع أنواع المكيفات: سبليت، مركزي، شباك، ودولابي.",
         whatWeOffer: [
@@ -351,6 +359,7 @@ export const SERVICES: Service[] = [
         description:
           "تشخيص وإصلاح أعطال الغسالات بمختلف أنواعها بقطع غيار أصلية.",
         subSlug: "washing-machine-maintenance",
+        image: "/services/maintenance/washing-machine-maintenance.jpg",
         longDescription:
           "صيانة وإصلاح الغسالات بجميع أنواعها (أوتوماتيك، فوق أوتوماتيك، عادية) على يد فنيين متخصصين، مع تشخيص دقيق للعطل واستخدام قطع غيار أصلية تضمن عمل الغسالة بكفاءة.",
         whatWeOffer: [
@@ -392,6 +401,7 @@ export const SERVICES: Service[] = [
         name: "صيانة ثلاجات",
         description: "إصلاح أعطال التبريد والثلاجات واستعادة كفاءتها بسرعة.",
         subSlug: "refrigerator-maintenance",
+        image: "/services/maintenance/refrigerator-maintenance.jpg",
         longDescription:
           "إصلاح وصيانة الثلاجات والفريزرات بمختلف أنواعها، مع معالجة مشاكل التبريد والتسريب واستعادة كفاءة الجهاز بأسرع وقت للحفاظ على أطعمتك.",
         whatWeOffer: [
@@ -434,6 +444,7 @@ export const SERVICES: Service[] = [
         description:
           "صيانة شاملة للأجهزة المنزلية على يد فنيين متخصصين.",
         subSlug: "home-appliances-maintenance",
+        image: "/services/maintenance/home-appliances-maintenance.jpg",
         longDescription:
           "صيانة شاملة لجميع الأجهزة المنزلية على يد فنيين متخصصين، من الأفران والمايكروويف إلى السخانات والمكانس وغيرها، بجودة عالية وأسعار مناسبة.",
         whatWeOffer: [
@@ -471,6 +482,7 @@ export const SERVICES: Service[] = [
         description:
           "برامج صيانة دورية تحافظ على أجهزتك وتطيل عمرها الافتراضي.",
         subSlug: "periodic-maintenance",
+        image: "/services/maintenance/periodic-maintenance.jpg",
         longDescription:
           "برامج صيانة دورية وقائية للأجهزة والمعدات المنزلية تحافظ على كفاءتها وتطيل عمرها الافتراضي وتوفّر عليك تكاليف الأعطال المفاجئة.",
         whatWeOffer: [
@@ -507,6 +519,7 @@ export const SERVICES: Service[] = [
         name: "إصلاح الأعطال",
         description: "استجابة سريعة لإصلاح الأعطال الطارئة في وقتها.",
         subSlug: "fault-repair",
+        image: "/services/maintenance/fault-repair.jpg",
         longDescription:
           "خدمة إصلاح أعطال طارئة سريعة لجميع الأجهزة والمعدات المنزلية، باستجابة فورية وتشخيص دقيق وإصلاح موثوق في نفس الزيارة قدر الإمكان.",
         whatWeOffer: [
@@ -544,6 +557,7 @@ export const SERVICES: Service[] = [
         description:
           "عقود صيانة مرنة للمنازل والمنشآت تضمن راحة البال.",
         subSlug: "maintenance-contracts",
+        image: "/services/maintenance/maintenance-contracts.jpg",
         longDescription:
           "عقود صيانة مرنة للمنازل والمنشآت تضمن صيانة منتظمة وأولوية في الخدمة وأسعاراً مميزة، لراحة بال دائمة دون القلق من الأعطال.",
         whatWeOffer: [
@@ -831,6 +845,11 @@ export function getService(slug: string) {
     so a listing can link every row without ever pointing at a 404. */
 export function subServiceHref(service: Service, sub: SubService) {
   return hasOwnPage(sub) ? `${service.href}/${sub.subSlug}` : service.href;
+}
+
+/** The sub-service's own photo, falling back to its category's. */
+export function subServiceImage(service: Service, sub: SubService) {
+  return sub.image ?? service.image;
 }
 
 /** Every sub-service that has its own page, with its category. Drives

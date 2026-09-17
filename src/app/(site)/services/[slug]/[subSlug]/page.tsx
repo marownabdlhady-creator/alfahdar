@@ -5,7 +5,11 @@ import { notFound } from "next/navigation";
 
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/nav";
-import { getSubService, listSubServicePages } from "@/lib/services";
+import {
+  getSubService,
+  listSubServicePages,
+  subServiceImage,
+} from "@/lib/services";
 import { absoluteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string; subSlug: string }> };
@@ -31,6 +35,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   const { service, sub } = found;
   const href = `${service.href}/${sub.subSlug}`;
+  const image = subServiceImage(service, sub);
   const alt = `${sub.name} من ${BRAND.name} في السعودية`;
 
   return {
@@ -45,13 +50,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url: href,
       title: sub.seoTitle,
       description: sub.seoDescription,
-      images: [{ url: service.image, alt }],
+      images: [{ url: image, alt }],
     },
     twitter: {
       card: "summary_large_image",
       title: sub.seoTitle,
       description: sub.seoDescription,
-      images: [service.image],
+      images: [image],
     },
   };
 }
@@ -134,6 +139,7 @@ export default async function SubServicePage({ params }: Params) {
   const { service, sub } = found;
   const href = `${service.href}/${sub.subSlug}`;
   const requestHref = `/request?service=${service.slug}`;
+  const image = subServiceImage(service, sub);
   const alt = `${sub.name} من ${BRAND.name} في السعودية`;
 
   /* The rest of this category's sub-services that already have a page. */
@@ -149,7 +155,7 @@ export default async function SubServicePage({ params }: Params) {
     description: sub.seoDescription,
     serviceType: sub.name,
     url: absoluteUrl(href),
-    image: absoluteUrl(service.image),
+    image: absoluteUrl(image),
     category: service.title,
     provider: {
       "@type": "Organization",
@@ -298,7 +304,7 @@ export default async function SubServicePage({ params }: Params) {
             <Reveal delay={90}>
               <div className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-line lg:aspect-[5/4]">
                 <Image
-                  src={service.image}
+                  src={image}
                   alt={alt}
                   fill
                   preload
@@ -454,12 +460,22 @@ export default async function SubServicePage({ params }: Params) {
                   <Reveal delay={index * 50} className="h-full">
                     <Link
                       href={entry.href}
-                      className="group flex h-full items-center justify-between gap-4 rounded-xl border border-line bg-surface px-6 py-5 transition-colors duration-fast ease-out hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+                      className="group flex h-full items-center gap-4 rounded-xl border border-line bg-surface p-4 transition-colors duration-fast ease-out hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                     >
-                      <span className="text-step-0 font-medium tracking-tight">
+                      {/* Decorative: the link text already names it. */}
+                      <span className="relative block h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                        <Image
+                          src={subServiceImage(entry.service, entry.sub)}
+                          alt=""
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      </span>
+                      <span className="flex-1 text-step-0 font-medium tracking-tight">
                         {entry.sub.name}
                       </span>
-                      <span className="text-muted transition-[color,transform] duration-fast ease-out group-hover:-translate-x-1 group-hover:text-accent">
+                      <span className="shrink-0 text-muted transition-[color,transform] duration-fast ease-out group-hover:-translate-x-1 group-hover:text-accent">
                         <ArrowIcon />
                       </span>
                     </Link>
